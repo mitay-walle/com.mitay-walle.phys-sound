@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 namespace PhysSound
@@ -8,6 +8,15 @@ namespace PhysSound
     {
         public List<PhysSoundAudioContainer> AudioContainers = new List<PhysSoundAudioContainer>();
         private Dictionary<int, PhysSoundAudioContainer> _audioContainersDic;
+
+        bool breakOnCollisionStay;
+        static Transform mainCamera;
+        float distanceToMainCamera;
+        bool alertNotInSoundZone;                               // if sound listener not in sound zone, than stop all Collision events
+        
+        // optimization for OnCollisionStay(), skip after maxStep steps
+        byte count;
+        float maxStep = 2.0f;
 
         /// <summary>
         /// Initializes the PhysSoundObject. Use this if you adding a PhysSoundObject component to an object at runtime.
@@ -75,6 +84,12 @@ namespace PhysSound
                 PhysSoundTempAudioPool.Create();
             else if (ImpactAudio != null && !ImpactAudio.isActiveAndEnabled)
                 ImpactAudio = PhysSoundTempAudioPool.GetAudioSourceCopy(ImpactAudio, gameObject);
+            
+            // @todo - menu in editor for choose camera
+            mainCamera = GameObject.Find("Main Camera").transform;
+            maxStep = Mathf.Round(Random.Range(2.0f, 4.0f));
+            //Debug.Log(maxStep);
+
         }
 
         void Update()
@@ -93,6 +108,19 @@ namespace PhysSound
 
             _kinematicAngularVelocity = Quaternion.Angle(_prevRotation, transform.rotation) / Time.deltaTime / 45f;
             _prevRotation = transform.rotation;
+
+            if ((1 / Time.unscaledDeltaTime) < 30+(maxStep*2))                     // if there is too much collision, then the minimum FPS will be " < X", because OnCollisionStay slows everything slows down
+                breakOnCollisionStay = true;
+            else
+                breakOnCollisionStay = false;
+            
+            // @todo - distance for each sound source of the Sound Material: impact, slide hard, slide soft
+            distanceToMainCamera = Vector3.Distance(mainCamera.position, transform.position);
+            if (distanceToMainCamera > GetComponent<AudioSource>().maxDistance)
+                alertNotInSoundZone = true;
+            else
+                alertNotInSoundZone = false;
+            
         }
 
         /// <summary>
@@ -190,16 +218,17 @@ namespace PhysSound
         #endregion
 
         #region 3D Collision Messages
+        // optimization: c.contacts[0] -> GetContact(0). You should avoid using this as it produces memory garbage. Use GetContact or GetContacts instead (from official documentation)
 
         Vector3 contactNormal, contactPoint, relativeVelocity;
 
         void OnCollisionEnter(Collision c)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0)
+            if (alertNotInSoundZone || SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 )
                 return;
 
-            contactNormal = c.contacts[0].normal;
-            contactPoint = c.contacts[0].point;
+            contactNormal = c.GetContact(0).normal;
+            contactPoint = c.GetContact(0).point;
             relativeVelocity = c.relativeVelocity;
 
             playImpactSound(c.collider.gameObject, relativeVelocity, contactNormal, contactPoint);
@@ -207,10 +236,19 @@ namespace PhysSound
             _setPrevVelocity = true;
         }
 
-
         void OnCollisionStay(Collision c)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || _audioContainersDic == null)
+            if (alertNotInSoundZone)
+                return;
+
+            count++;
+            if (count >= maxStep)
+            {
+                count = 0;
+                return;
+            }
+
+            if (breakOnCollisionStay || SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || _audioContainersDic == null)
                 return;
 
             if (_setPrevVelocity)
@@ -218,13 +256,13 @@ namespace PhysSound
                 _prevVelocity = _r.velocity;
                 _setPrevVelocity = false;
             }
-
+            
             Vector3 deltaVel = _r.velocity - _prevVelocity;
 
-            if (c.contacts.Length > 0)
+            if (c.contactCount > 0)
             {
-                contactNormal = c.contacts[0].normal;
-                contactPoint = c.contacts[0].point;
+                contactNormal = c.GetContact(0).normal;
+                contactPoint = c.GetContact(0).point;
             }
 
             relativeVelocity = c.relativeVelocity;
@@ -237,7 +275,7 @@ namespace PhysSound
 
         void OnCollisionExit(Collision c)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || _audioContainersDic == null)
+            if (alertNotInSoundZone || SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || _audioContainersDic == null )
                 return;
 
             setSlideTargetVolumes(c.collider.gameObject, Vector3.zero, Vector3.zero, transform.position, true);
