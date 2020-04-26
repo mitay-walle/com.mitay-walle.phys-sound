@@ -4,7 +4,7 @@
 
 # Optimization
 Optimization up ~30 fps in heavy scene.
-Change only PhysSoundObject.cs script.
+Changed only PhysSoundObject.cs script.
 
 PhysSound without optimization https://youtu.be/ESEi2VGAPBQ
 
