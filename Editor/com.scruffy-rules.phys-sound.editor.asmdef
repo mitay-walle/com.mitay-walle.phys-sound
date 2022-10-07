@@ -1,0 +1,18 @@
+{
+    "name": "com.scruffy-rules.phys-sound.editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0f7ce45594b446d488215a7a07ae01a7"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
