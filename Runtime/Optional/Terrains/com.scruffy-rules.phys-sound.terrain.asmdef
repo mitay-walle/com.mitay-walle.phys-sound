@@ -2,7 +2,9 @@
     "name": "com.scruffy-rules.phys-sound.terrain",
     "rootNamespace": "",
     "references": [
-        "GUID:0f7ce45594b446d488215a7a07ae01a7"
+        "GUID:0f7ce45594b446d488215a7a07ae01a7",
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21",
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

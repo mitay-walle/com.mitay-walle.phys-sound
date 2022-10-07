@@ -15,13 +15,41 @@ MonoBehaviour:
   MaterialTypeKey: 2
   FallbackTypeIndex: -1
   FallbackTypeKey: 0
+  VolumeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   RelativeVelocityThreshold:
     Min: 0
     Max: 0
   PitchRandomness: 0.1
+  TimeScalePitch: 0
   SlidePitchMod: 0.05
+  SlideVolMultiplier: 1
   ImpactNormalBias: 1
+  ScaleMod: 0.15
   CollisionMask:
+    serializedVersion: 2
     m_Bits: 4294967295
   UseCollisionVelocity: 0
   ScaleImpactVolume: 0
