@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 91c0dc3ffa247314b8af35444e57e413
+labels:
+- Physics
+- Sound
+- Audio
+- Impact
+timeCreated: 1432442511
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

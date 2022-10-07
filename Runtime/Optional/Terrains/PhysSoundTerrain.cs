@@ -3,27 +3,31 @@ using System.Collections.Generic;
 
 namespace PhysSound
 {
-    #if ENABLE_TERRAIN
     [AddComponentMenu("PhysSound/PhysSound Terrain")]
     public class PhysSoundTerrain : PhysSoundBase
     {
+#if PHYS_SOUND_TERRAIN
         public Terrain Terrain;
+        TerrainData terrainData;
+#else
+        public Behaviour Terrain;
+#endif
+
         public List<PhysSoundMaterial> SoundMaterials = new List<PhysSoundMaterial>();
         Dictionary<int, PhysSoundComposition> compDic = new Dictionary<int, PhysSoundComposition>();
-
-        TerrainData terrainData;
         Vector3 terrainPos;
 
         void Start()
         {
+#if PHYS_SOUND_TERRAIN
             terrainData = Terrain.terrainData;
             terrainPos = Terrain.transform.position;
-
             foreach (PhysSoundMaterial mat in SoundMaterials)
             {
                 if (!compDic.ContainsKey(mat.MaterialTypeKey))
                     compDic.Add(mat.MaterialTypeKey, new PhysSoundComposition(mat.MaterialTypeKey));
             }
+#endif
         }
 
         /// <summary>
@@ -70,8 +74,9 @@ namespace PhysSound
 
         private float[] getTextureMix(Vector3 worldPos)
         {
-            int mapX = (int)(((worldPos.x - terrainPos.x) / terrainData.size.x) * terrainData.alphamapWidth);
-            int mapZ = (int)(((worldPos.z - terrainPos.z) / terrainData.size.z) * terrainData.alphamapHeight);
+#if PHYS_SOUND_TERRAIN
+            int mapX = (int) (((worldPos.x - terrainPos.x) / terrainData.size.x) * terrainData.alphamapWidth);
+            int mapZ = (int) (((worldPos.z - terrainPos.z) / terrainData.size.z) * terrainData.alphamapHeight);
 
             float[,,] splatmapData = terrainData.GetAlphamaps(mapX, mapZ, 1, 1);
 
@@ -83,6 +88,8 @@ namespace PhysSound
             }
 
             return cellMix;
+#endif
+            return null;
         }
 
         private int getDominantTexture(Vector3 worldPos)
@@ -104,34 +111,4 @@ namespace PhysSound
             return maxMixIndex;
         }
     }
-
-    public class PhysSoundComposition
-    {
-        public int KeyIndex;
-        public float Value;
-        public int Count;
-
-        public PhysSoundComposition(int key)
-        {
-            KeyIndex = key;
-        }
-
-        public void Reset()
-        {
-            Value = 0;
-            Count = 0;
-        }
-
-        public void Add(float val)
-        {
-            Value += val;
-            Count++;
-        }
-
-        public float GetAverage()
-        {
-            return Value / Count;
-        }
-    }
-    #endif
 }

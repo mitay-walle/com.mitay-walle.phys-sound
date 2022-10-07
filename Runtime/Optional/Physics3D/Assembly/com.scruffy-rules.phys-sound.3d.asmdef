@@ -1,0 +1,22 @@
+{
+    "name": "com.scruffy-rules.phys-sound.3d",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0f7ce45594b446d488215a7a07ae01a7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.physics",
+            "expression": "0",
+            "define": "PHYS_SOUND_3D"
+        }
+    ],
+    "noEngineReferences": false
+}

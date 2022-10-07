@@ -24,8 +24,6 @@ namespace PhysSound
 
         protected int _lastFrame;
 
-        protected Rigidbody _r;
-        protected Rigidbody2D _r2D;
 
         protected Vector3 TotalKinematicVelocity
         {

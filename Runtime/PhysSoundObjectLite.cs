@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 namespace PhysSound
 {
     [AddComponentMenu("PhysSound/PhysSound Object Lite")]
-    public class PhysSoundObjectLite : PhysSoundObjectBase
+    public partial class PhysSoundObjectLite : PhysSoundObjectBase
     {
         void Update()
         {
@@ -26,8 +25,12 @@ namespace PhysSound
         /// </summary>
         public override void Initialize()
         {
+#if PHYS_SOUND_3D
             _r = GetComponent<Rigidbody>();
+#endif
+#if PHYS_SOUND_3D
             _r2D = GetComponent<Rigidbody2D>();
+#endif
 
             if (AutoCreateSources)
             {
@@ -70,63 +73,5 @@ namespace PhysSound
                 this.enabled = false;
             }
         }
-
-        #region 3D Collision Messages
-
-        Vector3 contactNormal, contactPoint, relativeVelocity;
-
-        void OnCollisionEnter(Collision c)
-        {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0)
-                return;
-
-            contactNormal = c.contacts[0].normal;
-            contactPoint = c.contacts[0].point;
-            relativeVelocity = c.relativeVelocity;
-
-            playImpactSound(c.collider.gameObject, relativeVelocity, contactNormal, contactPoint);
-
-            _setPrevVelocity = true;
-        }
-
-        #endregion
-
-        #region 3D Trigger Messages
-
-        void OnTriggerEnter(Collider c)
-        {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || !HitsTriggers)
-                return;
-
-            playImpactSound(c.gameObject, TotalKinematicVelocity, Vector3.zero, c.transform.position);
-        }
-
-        #endregion
-
-        #region 2D Collision Messages
-
-        void OnCollisionEnter2D(Collision2D c)
-        {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0)
-                return;
-
-            playImpactSound(c.collider.gameObject, c.relativeVelocity, c.contacts[0].normal, c.contacts[0].point);
-
-            _setPrevVelocity = true;
-        }
-
-        #endregion
-
-        #region 2D Trigger Messages
-
-        void OnTriggerEnter2D(Collider2D c)
-        {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0)
-                return;
-
-            playImpactSound(c.gameObject, TotalKinematicVelocity, Vector3.zero, c.transform.position);
-        }
-
-        #endregion
     }
 }
