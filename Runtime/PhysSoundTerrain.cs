@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace PhysSound
 {
+    #if ENABLE_TERRAIN
     [AddComponentMenu("PhysSound/PhysSound Terrain")]
     public class PhysSoundTerrain : PhysSoundBase
     {
@@ -132,4 +133,5 @@ namespace PhysSound
             return Value / Count;
         }
     }
+    #endif
 }
