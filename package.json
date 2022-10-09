@@ -1,7 +1,7 @@
 {
   "name": "com.scruffy-rules.phys-sound",
   "version": "1.0.0",
-  "displayName": "Scruffy Rules Phys Sound",
+  "displayName": "Phys Sound",
   "description": "The PhysSound system adds the ability to bring your physics to life through the use of impact and sliding\nsounds. The system works with both 2D and 3D physics.\nThere are 3 parts of the system: PhysSound Material Types, PhysSound Materials, PhysSound Objects",
   "unity": "2018.4",
   "documentationUrl": "https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/main/README.md",
