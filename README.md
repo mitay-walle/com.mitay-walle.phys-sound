@@ -6,9 +6,12 @@ The PhysSound system adds the ability to bring your physics to life through the 
 sounds. The system works with both 2D and 3D physics.
 There are 3 parts of the system: PhysSound Material Types, PhysSound Materials, PhysSound Objects.
 
+Install [by Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
+
 Optional modules dependent to unity built-in modules:
 - Terrain
 - 2D Collision events
 - 3D Collision events
+
 
 ![](https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/Documentation/Screenshot_1.png)
