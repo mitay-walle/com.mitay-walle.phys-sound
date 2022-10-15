@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaterialTypeKey: {fileID: 11400000, guid: 7ba07efcbfcd1df46952099526694e8d, type: 2}
   FallbackTypeKey: {fileID: 11400000, guid: 7ba07efcbfcd1df46952099526694e8d, type: 2}
-  _database: {fileID: 11400000, guid: 9935a0afc0ba39b4983c771a5633ba37, type: 2}
+  _database: {fileID: 11400000, guid: 511756466eef4a941adfd588bace243f, type: 2}
   TimeScalePitch: 0
   ScaleImpactVolume: 0
   SlidePitchMod: 0.05
