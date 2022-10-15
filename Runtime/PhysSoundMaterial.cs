@@ -1,105 +1,144 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using PhysSound.Utilities;
 
 namespace PhysSound
 {
     public class PhysSoundMaterial : ScriptableObject
     {
-        public int MaterialTypeKey;
-        public int FallbackTypeIndex;
-        public int FallbackTypeKey;
-        public AnimationCurve VolumeCurve = AnimationCurve.Linear(0, 0, 1, 1);
+        public PhysSoundKey MaterialTypeKey;
+        public PhysSoundKey FallbackTypeKey;
+        [SerializeField] protected PhysSoundDatabase _database;
 
-        public Range RelativeVelocityThreshold;
-        public float PitchRandomness = 0.1f;
         public bool TimeScalePitch;
-        public float SlidePitchMod = 0.05f;
-        public float SlideVolMultiplier = 1;
-        public float ImpactNormalBias = 1;
-        public float ScaleMod = 0.15f;
-
-        public LayerMask CollisionMask = -1;
-
-        public bool UseCollisionVelocity = true;
         public bool ScaleImpactVolume = true;
+        public float SlidePitchMod = 0.05f;
+
+        [SerializeField] protected AnimationCurve VolumeCurve = AnimationCurve.Linear(0, 0, 1, 1);
+        [SerializeField] protected LayerMask CollisionMask = -1;
+        [SerializeField] protected Range RelativeVelocityThreshold;
+        [SerializeField] protected float PitchRandomness = 0.1f;
+        [SerializeField] protected float SlideVolMultiplier = 1;
+        [SerializeField] protected float ImpactNormalBias = 1;
+        [SerializeField] protected float ScaleMod = 0.15f;
+        [SerializeField] protected bool UseCollisionVelocity = true;
 
         public List<PhysSoundAudioSet> AudioSets = new List<PhysSoundAudioSet>();
-        private Dictionary<int, PhysSoundAudioSet> audioSetDic;
+        private Dictionary<PhysSoundKey, PhysSoundAudioSet> _audioSetDic;
 
-        void OnEnable()
+        public void Init()
         {
             if (AudioSets.Count <= 0)
                 return;
 
-            audioSetDic = new Dictionary<int, PhysSoundAudioSet>();
+            _audioSetDic = new Dictionary<PhysSoundKey, PhysSoundAudioSet>();
 
             foreach (PhysSoundAudioSet audSet in AudioSets)
             {
-                if (audioSetDic.ContainsKey(audSet.Key))
+                if (_audioSetDic.ContainsKey(audSet.Key))
                 {
-                    Debug.LogError("PhysSound Material " + name + " has duplicate audio set for Material Type \"" + PhysSoundTypeList.GetKey(audSet.Key) + "\". It will not be used during runtime.");
+                    Debug.LogError(
+                        $"PhysSound Material {name} has duplicate audio set for Material Type '{audSet.Key.name}'. It will not be used during runtime.");
+
                     continue;
                 }
 
-                audioSetDic.Add(audSet.Key, audSet);
+                _audioSetDic.Add(audSet.Key, audSet);
             }
-
-            if (FallbackTypeIndex == 0)
-                FallbackTypeKey = -1;
-            else
-                FallbackTypeKey = AudioSets[FallbackTypeIndex - 1].Key;
         }
 
-        /// <summary>
-        /// Gets the impact audio clip based on the given object that was hit, the velocity of the collision, the normal, and the contact point.
-        /// </summary>
-        public AudioClip GetImpactAudio(GameObject otherObject, Vector3 relativeVel, Vector3 norm, Vector3 contact, int layer = -1)
+        public AudioClip GetImpactAudio(Collider other, Vector3 relativeVel, Vector3 norm, Vector3 contact)
         {
-            if (audioSetDic == null)
+            if (!CanCollideAudioWith(other.gameObject))
                 return null;
 
-            if (!CollideWith(otherObject))
+            PhysSoundBase otherPhysSoundComponent = other.GetComponent<PhysSoundBase>();
+            PhysSoundKey soundKey = null;
+
+            if (otherPhysSoundComponent)
+            {
+                PhysSoundMaterial soundMaterial = otherPhysSoundComponent.GetPhysSoundMaterial(contact);
+                soundKey = soundMaterial.MaterialTypeKey;
+                return GetImpactAudio(soundKey, relativeVel, norm, contact);
+            }
+
+            PhysSoundKey key = _database.GetSoundMaterial(other.sharedMaterial);
+            return GetImpactAudio(key, relativeVel, norm, contact);
+        }
+
+        public AudioClip GetImpactAudio(Collider2D other, Vector3 relativeVel, Vector3 norm, Vector3 contact)
+        {
+            if (!CanCollideAudioWith(other.gameObject))
                 return null;
 
-            PhysSoundMaterial m = null;
-            PhysSoundBase b = otherObject.GetComponent<PhysSoundBase>();
+            PhysSoundBase otherPhysSoundComponent = other.GetComponent<PhysSoundBase>();
 
-            if (b)
-                m = b.GetPhysSoundMaterial(contact);
+            if (otherPhysSoundComponent)
+            {
+                PhysSoundMaterial soundMaterial = otherPhysSoundComponent.GetPhysSoundMaterial(contact);
+                PhysSoundKey soundKey = soundMaterial.MaterialTypeKey;
+                return GetImpactAudio(soundKey, relativeVel, norm, contact);
+            }
+
+            PhysSoundKey key = _database.GetSoundMaterial(other.sharedMaterial);
+            return GetImpactAudio(key, relativeVel, norm, contact);
+        }
+
+        private AudioClip GetImpactAudio(PhysSoundKey soundKey, Vector3 relativeVel, Vector3 norm,
+            Vector3 contact)
+        {
+            if (_audioSetDic == null)
+                return null;
 
             float velNorm = GetImpactVolume(relativeVel, norm);
             if (velNorm <= 0)
                 return null;
 
-            //Get sounds using collision velocity
             if (UseCollisionVelocity)
             {
-                if (m)
+                //Get sounds using collision velocity
+                if (soundKey)
                 {
-                    PhysSoundAudioSet audSet;
-
-                    if (audioSetDic.TryGetValue(m.MaterialTypeKey, out audSet))
+                    if (_audioSetDic.TryGetValue(soundKey, out PhysSoundAudioSet audSet))
+                    {
                         return audSet.GetImpact(velNorm, false);
-                    else if (FallbackTypeKey != -1)
-                        return audioSetDic[FallbackTypeKey].GetImpact(velNorm, false);
+                    }
+
+                    if (FallbackTypeKey != null)
+                    {
+                        return _audioSetDic[FallbackTypeKey].GetImpact(velNorm, false);
+                    }
                 }
-                else if (FallbackTypeKey != -1)
-                    return audioSetDic[FallbackTypeKey].GetImpact(velNorm, false);
+                else
+                {
+                    if (FallbackTypeKey != null)
+                    {
+                        return _audioSetDic[FallbackTypeKey].GetImpact(velNorm, false);
+                    }
+                }
             }
-            //Get sound randomly
             else
             {
-                if (m)
+                //Get sound randomly
+                if (soundKey)
                 {
-                    PhysSoundAudioSet audSet;
-
-                    if (audioSetDic.TryGetValue(m.MaterialTypeKey, out audSet))
+                    if (_audioSetDic.TryGetValue(soundKey, out PhysSoundAudioSet audSet))
+                    {
                         return audSet.GetImpact(0, true);
-                    else if (FallbackTypeKey != -1)
-                        return audioSetDic[FallbackTypeKey].GetImpact(0, true);
+                    }
+
+                    if (FallbackTypeKey != null)
+                    {
+                        return _audioSetDic[FallbackTypeKey].GetImpact(0, true);
+                    }
                 }
-                else if (FallbackTypeKey != -1)
-                    return audioSetDic[FallbackTypeKey].GetImpact(0, true);
+                else
+                {
+                    if (FallbackTypeKey != null)
+                    {
+                        return _audioSetDic[FallbackTypeKey].GetImpact(0, true);
+                    }
+                }
             }
 
             return null;
@@ -121,7 +160,10 @@ namespace PhysSound
         /// </summary>
         public float GetImpactVolume(Vector3 relativeVel, Vector3 norm)
         {
-            float impactAmt = norm == Vector3.zero ? 1 : Mathf.Abs(Vector3.Dot(norm.normalized, relativeVel.normalized));
+            float impactAmt = norm == Vector3.zero
+                ? 1
+                : Mathf.Abs(Vector3.Dot(norm.normalized, relativeVel.normalized));
+
             float impactVel = (impactAmt + (1 - impactAmt) * (1 - ImpactNormalBias)) * relativeVel.magnitude;
 
             if (impactVel < RelativeVelocityThreshold.Min)
@@ -162,11 +204,11 @@ namespace PhysSound
         /// <summary>
         /// Checks if this material has an audio set corresponding to the given key index.
         /// </summary>
-        public bool HasAudioSet(int keyIndex)
+        public bool HasAudioSet(PhysSoundKey key)
         {
             foreach (PhysSoundAudioSet aud in AudioSets)
             {
-                if (aud.CompareKeyIndex(keyIndex))
+                if (aud.CompareKey(key))
                     return true;
             }
 
@@ -176,11 +218,11 @@ namespace PhysSound
         /// <summary>
         /// Gets the audio set corresponding to the given key index, if it exists.
         /// </summary>
-        public PhysSoundAudioSet GetAudioSet(int keyIndex)
+        public PhysSoundAudioSet GetAudioSet(PhysSoundKey key)
         {
             foreach (PhysSoundAudioSet aud in AudioSets)
             {
-                if (aud.CompareKeyIndex(keyIndex))
+                if (aud.CompareKey(key))
                     return aud;
             }
 
@@ -188,25 +230,9 @@ namespace PhysSound
         }
 
         /// <summary>
-        /// Gets the list of audio set names. (Used by the editor to display the list of potential fallback audio sets).
-        /// </summary>
-        public string[] GetFallbackAudioSets()
-        {
-            string[] names = new string[AudioSets.Count + 1];
-            names[0] = "None";
-
-            for (int i = 0; i < AudioSets.Count; i++)
-            {
-                names[i + 1] = PhysSoundTypeList.GetKey(AudioSets[i].Key);
-            }
-
-            return names;
-        }
-
-        /// <summary>
         /// Compares the layer of the given GameObject to this material's collision mask.
         /// </summary>
-        public bool CollideWith(GameObject g)
+        public bool CanCollideAudioWith(GameObject g)
         {
             return (1 << g.layer & CollisionMask.value) != 0;
         }

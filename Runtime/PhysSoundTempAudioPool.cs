@@ -65,14 +65,14 @@ namespace PhysSound
             target.volume = template.volume;
         }
 
-        private PhysSoundTempAudio[] audioSources;
-        private int lastAvailable;
+        private PhysSoundTempAudio[] _audioSources;
+        private int _lastAvailable;
 
         public void Initialize()
         {
             Instance = this;
 
-            audioSources = new PhysSoundTempAudio[TempAudioPoolSize];
+            _audioSources = new PhysSoundTempAudio[TempAudioPoolSize];
 
             for (int i = 0; i < TempAudioPoolSize; i++)
             {
@@ -80,24 +80,24 @@ namespace PhysSound
                 PhysSoundTempAudio a = g.AddComponent<PhysSoundTempAudio>();
                 a.Initialize(this);
 
-                audioSources[i] = a;
+                _audioSources[i] = a;
             }
         }
 
         public void PlayClip(AudioClip clip, Vector3 point, AudioSource template, float volume, float pitch)
         {
             int checkedIndices = 0;
-            int i = lastAvailable;
+            int i = _lastAvailable;
 
             while (checkedIndices < TempAudioPoolSize)
             {
-                PhysSoundTempAudio a = audioSources[i];
+                PhysSoundTempAudio a = _audioSources[i];
 
                 if (!a.gameObject.activeInHierarchy)
                 {
                     a.PlayClip(clip, point, template, volume, pitch);
 
-                    lastAvailable = i;
+                    _lastAvailable = i;
                     return;
                 }
 
@@ -112,17 +112,17 @@ namespace PhysSound
         public AudioSource GetSource(AudioSource template)
         {
             int checkedIndices = 0;
-            int i = lastAvailable;
+            int i = _lastAvailable;
 
             while (checkedIndices < TempAudioPoolSize)
             {
-                PhysSoundTempAudio a = audioSources[i];
+                PhysSoundTempAudio a = _audioSources[i];
 
                 if (!a.gameObject.activeInHierarchy)
                 {
                     CopyAudioSource(template, a.Audio);
                     a.gameObject.SetActive(true);
-                    lastAvailable = i;
+                    _lastAvailable = i;
                     return a.Audio;
                 }
 

@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 
-namespace PhysSound
+namespace PhysSound.Utilities
 {
     [System.Serializable]
     public struct Range
@@ -25,7 +23,7 @@ namespace PhysSound
         /// <summary>
         /// Checks to see if the given value is within the range's min and max values.
         /// </summary>
-        public bool isWithinRange(float f)
+        public bool IsWithinRange(float f)
         {
             return (f >= Min && f <= Max);
         }

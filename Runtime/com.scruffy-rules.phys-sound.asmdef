@@ -1,4 +1,33 @@
 {
-	"name": "com.scruffy-rules.phys-sound",
-	"references":[ "GUID:343deaaf83e0cee4ca978e7df0b80d21", "GUID:2bafac87e7f4b9b418d9448d219b01ab" ]
+    "name": "com.scruffy-rules.phys-sound",
+    "rootNamespace": "PhysSound",
+    "references": [
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21",
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.physics",
+            "expression": "0",
+            "define": "PHYS_SOUND_3D"
+        },
+        {
+            "name": "com.unity.modules.physics2d",
+            "expression": "0",
+            "define": "PHYS_SOUND_2D"
+        },
+        {
+            "name": "com.unity.modules.terrain",
+            "expression": "0",
+            "define": "PHYS_SOUND_TERRAIN"
+        }
+    ],
+    "noEngineReferences": false
 }

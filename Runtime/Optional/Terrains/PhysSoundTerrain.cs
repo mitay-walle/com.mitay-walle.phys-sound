@@ -1,31 +1,31 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-namespace PhysSound
+namespace PhysSound.Optional.Terrains
 {
     [AddComponentMenu("PhysSound/PhysSound Terrain")]
     public class PhysSoundTerrain : PhysSoundBase
     {
 #if PHYS_SOUND_TERRAIN
         public Terrain Terrain;
-        TerrainData terrainData;
+        private TerrainData _terrainData;
 #else
         public Behaviour Terrain;
 #endif
 
         public List<PhysSoundMaterial> SoundMaterials = new List<PhysSoundMaterial>();
-        Dictionary<int, PhysSoundComposition> compDic = new Dictionary<int, PhysSoundComposition>();
-        Vector3 terrainPos;
+        private Dictionary<PhysSoundKey, PhysSoundComposition> _compDic = new Dictionary<PhysSoundKey, PhysSoundComposition>();
+        private Vector3 _terrainPos;
 
-        void Start()
+        private void Start()
         {
 #if PHYS_SOUND_TERRAIN
-            terrainData = Terrain.terrainData;
-            terrainPos = Terrain.transform.position;
+            _terrainData = Terrain.terrainData;
+            _terrainPos = Terrain.transform.position;
             foreach (PhysSoundMaterial mat in SoundMaterials)
             {
-                if (!compDic.ContainsKey(mat.MaterialTypeKey))
-                    compDic.Add(mat.MaterialTypeKey, new PhysSoundComposition(mat.MaterialTypeKey));
+                if (!_compDic.ContainsKey(mat.MaterialTypeKey))
+                    _compDic.Add(mat.MaterialTypeKey, new PhysSoundComposition(mat.MaterialTypeKey));
             }
 #endif
         }
@@ -35,7 +35,7 @@ namespace PhysSound
         /// </summary>
         public override PhysSoundMaterial GetPhysSoundMaterial(Vector3 contactPoint)
         {
-            int dominantIndex = getDominantTexture(contactPoint);
+            int dominantIndex = GetDominantTexture(contactPoint);
 
             if (dominantIndex < SoundMaterials.Count && SoundMaterials[dominantIndex] != null)
                 return SoundMaterials[dominantIndex];
@@ -46,12 +46,12 @@ namespace PhysSound
         /// <summary>
         /// Gets the composition of PhysSound Materials at the given point on the terrain.
         /// </summary>
-        public Dictionary<int, PhysSoundComposition> GetComposition(Vector3 contactPoint)
+        public Dictionary<PhysSoundKey, PhysSoundComposition> GetComposition(Vector3 contactPoint)
         {
-            foreach (PhysSoundComposition c in compDic.Values)
+            foreach (PhysSoundComposition c in _compDic.Values)
                 c.Reset();
 
-            float[] mix = getTextureMix(contactPoint);
+            float[] mix = GetTextureMix(contactPoint);
 
             for (int i = 0; i < mix.Length; i++)
             {
@@ -63,22 +63,22 @@ namespace PhysSound
 
                 PhysSoundComposition comp;
 
-                if (compDic.TryGetValue(SoundMaterials[i].MaterialTypeKey, out comp))
+                if (_compDic.TryGetValue(SoundMaterials[i].MaterialTypeKey, out comp))
                 {
                     comp.Add(mix[i]);
                 }
             }
 
-            return compDic;
+            return _compDic;
         }
 
-        private float[] getTextureMix(Vector3 worldPos)
+        private float[] GetTextureMix(Vector3 worldPos)
         {
 #if PHYS_SOUND_TERRAIN
-            int mapX = (int) (((worldPos.x - terrainPos.x) / terrainData.size.x) * terrainData.alphamapWidth);
-            int mapZ = (int) (((worldPos.z - terrainPos.z) / terrainData.size.z) * terrainData.alphamapHeight);
+            int mapX = (int) (((worldPos.x - _terrainPos.x) / _terrainData.size.x) * _terrainData.alphamapWidth);
+            int mapZ = (int) (((worldPos.z - _terrainPos.z) / _terrainData.size.z) * _terrainData.alphamapHeight);
 
-            float[,,] splatmapData = terrainData.GetAlphamaps(mapX, mapZ, 1, 1);
+            float[,,] splatmapData = _terrainData.GetAlphamaps(mapX, mapZ, 1, 1);
 
             float[] cellMix = new float[splatmapData.GetUpperBound(2) + 1];
 
@@ -92,9 +92,9 @@ namespace PhysSound
             return null;
         }
 
-        private int getDominantTexture(Vector3 worldPos)
+        private int GetDominantTexture(Vector3 worldPos)
         {
-            float[] mix = getTextureMix(worldPos);
+            float[] mix = GetTextureMix(worldPos);
 
             float maxMix = 0;
             int maxMixIndex = 0;

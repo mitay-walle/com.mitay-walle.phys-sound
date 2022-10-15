@@ -2,36 +2,33 @@
 
 namespace PhysSound
 {
-    public class PhysSoundObjectBase : PhysSoundBase
+    public abstract class PhysSoundObjectBase : PhysSoundBase
     {
         public PhysSoundMaterial SoundMaterial;
-
-        public bool AutoCreateSources;
+        [SerializeField] protected AudioSource ImpactAudio;
+        [SerializeField] protected bool AutoCreateSources;
+        [SerializeField] protected bool HitsTriggers;
         public bool PlayClipAtPoint;
-        public bool HitsTriggers;
 
-        public AudioSource ImpactAudio;
+        protected float KinematicAngularVelocity;
+        protected float BaseImpactVol;
+        protected float BaseImpactPitch;
+        protected int LastFrame;
+        protected bool SetPrevVelocity = true;
+        protected Vector3 PrevVelocity;
+        protected Vector3 PrevPosition;
+        protected Vector3 KinematicVelocity;
+        protected Quaternion PrevRotation;
 
-        protected float baseImpactVol, baseImpactPitch;
+        protected Vector3 TotalKinematicVelocity => KinematicVelocity + (Vector3.one * KinematicAngularVelocity);
 
-        protected Vector3 _prevVelocity;
-        protected bool _setPrevVelocity = true;
-
-        protected Vector3 _prevPosition;
-        protected Vector3 _kinematicVelocity;
-        protected Quaternion _prevRotation;
-        protected float _kinematicAngularVelocity;
-
-        protected int _lastFrame;
-
-
-        protected Vector3 TotalKinematicVelocity
-        {
-            get { return _kinematicVelocity + (Vector3.one * _kinematicAngularVelocity); }
-        }
-
-
-        void Start()
+#if PHYS_SOUND_3D
+        protected Rigidbody _r;
+#endif
+#if PHYS_SOUND_2D
+        protected Rigidbody2D _r2D;
+#endif
+        private void Start()
         {
             if (SoundMaterial == null)
                 return;
@@ -39,51 +36,71 @@ namespace PhysSound
             Initialize();
         }
 
-        /// <summary>
-        /// Gets the PhysSound Material of this object.
-        /// </summary>
-        public override PhysSoundMaterial GetPhysSoundMaterial(Vector3 contactPoint)
+        public override PhysSoundMaterial GetPhysSoundMaterial(Vector3 contactPoint) => SoundMaterial;
+
+        public abstract void SetEnabled(bool enabled);
+
+        protected abstract void Initialize();
+
+        protected void PlayImpactSound(Collider other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {
-            return SoundMaterial;
-        }
-
-        public virtual void Initialize() { }
-
-        public virtual void SetEnabled(bool enabled) { }
-
-        protected void playImpactSound(GameObject otherObject, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
-        {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || Time.frameCount == _lastFrame)
+            if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 || Time.frameCount == LastFrame)
             {
                 return;
             }
 
-            if (ImpactAudio)
+            if (!ImpactAudio) return;
+
+            AudioClip clip = SoundMaterial.GetImpactAudio(other, relativeVelocity, normal, contactPoint);
+            if (clip)
             {
-                AudioClip a = SoundMaterial.GetImpactAudio(otherObject, relativeVelocity, normal, contactPoint);
-
-                if (a)
-                {
-                    float pitch = baseImpactPitch * SoundMaterial.GetScaleModPitch(transform.localScale) + SoundMaterial.GetRandomPitch();
-                    float vol = baseImpactVol * SoundMaterial.GetScaleModVolume(transform.localScale) * SoundMaterial.GetImpactVolume(relativeVelocity, normal);
-
-                    if (PlayClipAtPoint)
-                    {
-                        PhysSoundTempAudioPool.Instance.PlayClip(a, transform.position, ImpactAudio, SoundMaterial.ScaleImpactVolume ? vol : ImpactAudio.volume, pitch);
-                    }
-                    else
-                    {
-                        ImpactAudio.pitch = pitch;
-                        if (SoundMaterial.ScaleImpactVolume)
-                            ImpactAudio.volume = vol;
-
-                        ImpactAudio.clip = a;
-                        ImpactAudio.Play();
-                    }
-
-                    _lastFrame = Time.frameCount;
-                }
+                PlayImpactSound(clip, relativeVelocity, normal, contactPoint);
             }
+        }
+
+        protected void PlayImpactSound(Collider2D other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
+        {
+            if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 || Time.frameCount == LastFrame)
+            {
+                return;
+            }
+
+            if (!ImpactAudio) return;
+
+            AudioClip clip = SoundMaterial.GetImpactAudio(other, relativeVelocity, normal, contactPoint);
+            if (clip)
+            {
+                PlayImpactSound(clip, relativeVelocity, normal, contactPoint);
+            }
+        }
+
+        protected void PlayImpactSound(AudioClip clip, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
+        {
+            float pitch = BaseImpactPitch * SoundMaterial.GetScaleModPitch(transform.localScale) +
+                          SoundMaterial.GetRandomPitch();
+
+            float vol = BaseImpactVol * SoundMaterial.GetScaleModVolume(transform.localScale) *
+                        SoundMaterial.GetImpactVolume(relativeVelocity, normal);
+
+            if (PlayClipAtPoint)
+            {
+                PhysSoundTempAudioPool.Instance.PlayClip(clip,
+                    transform.position,
+                    ImpactAudio,
+                    SoundMaterial.ScaleImpactVolume ? vol : ImpactAudio.volume,
+                    pitch);
+            }
+            else
+            {
+                ImpactAudio.pitch = pitch;
+                if (SoundMaterial.ScaleImpactVolume)
+                    ImpactAudio.volume = vol;
+
+                ImpactAudio.clip = clip;
+                ImpactAudio.Play();
+            }
+
+            LastFrame = Time.frameCount;
         }
     }
 }

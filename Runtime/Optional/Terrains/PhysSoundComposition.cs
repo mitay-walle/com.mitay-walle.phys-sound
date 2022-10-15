@@ -1,14 +1,14 @@
-namespace PhysSound
+namespace PhysSound.Optional.Terrains
 {
     public class PhysSoundComposition
     {
-        public int KeyIndex;
+        public PhysSoundKey Key;
         public float Value;
         public int Count;
 
-        public PhysSoundComposition(int key)
+        public PhysSoundComposition(PhysSoundKey key)
         {
-            KeyIndex = key;
+            Key = key;
         }
 
         public void Reset()

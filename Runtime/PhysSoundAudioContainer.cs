@@ -5,26 +5,23 @@ namespace PhysSound
     [System.Serializable]
     public class PhysSoundAudioContainer
     {
-        public int KeyIndex;
+        public PhysSoundKey Key;
         public AudioSource SlideAudio;
 
-        private PhysSoundObject physSoundObject;
+        private PhysSoundObject _physSoundObject;
         private float _targetVolume;
         private float _baseVol, _basePitch, _basePitchRand;
 
         private int _lastFrame;
         private bool _lastExit;
 
-        private AudioSource currAudioSource;
+        private AudioSource _currAudioSource;
 
-        private PhysSoundMaterial soundMaterial
-        {
-            get { return physSoundObject.SoundMaterial; }
-        }
+        private PhysSoundMaterial SoundMaterial => _physSoundObject.SoundMaterial;
 
-        public PhysSoundAudioContainer(int k)
+        public PhysSoundAudioContainer(PhysSoundKey k)
         {
-            KeyIndex = k;
+            Key = k;
         }
 
         /// <summary>
@@ -35,17 +32,17 @@ namespace PhysSound
             if (SlideAudio == null)
                 return;
 
-            physSoundObject = obj;
+            _physSoundObject = obj;
 
             _baseVol = SlideAudio.volume;
             _basePitch = SlideAudio.pitch;
             _basePitchRand = _basePitch;
 
-            SlideAudio.clip = soundMaterial.GetAudioSet(KeyIndex).Slide;
+            SlideAudio.clip = SoundMaterial.GetAudioSet(Key).Slide;
             SlideAudio.loop = true;
             SlideAudio.volume = 0;
 
-            currAudioSource = SlideAudio;
+            _currAudioSource = SlideAudio;
         }
 
         /// <summary>
@@ -53,7 +50,7 @@ namespace PhysSound
         /// </summary>
         public void Initialize(PhysSoundObject obj, AudioSource template)
         {
-            physSoundObject = obj;
+            _physSoundObject = obj;
             SlideAudio = template;
 
             _baseVol = template.volume;
@@ -70,9 +67,9 @@ namespace PhysSound
             if (SlideAudio == null)
                 return;
 
-            float vol = exit || !soundMaterial.CollideWith(otherObject)
+            float vol = exit || !SoundMaterial.CanCollideAudioWith(otherObject)
                 ? 0
-                : soundMaterial.GetSlideVolume(relativeVelocity, normal) * _baseVol * mod;
+                : SoundMaterial.GetSlideVolume(relativeVelocity, normal) * _baseVol * mod;
 
             if (_lastFrame == Time.frameCount)
             {
@@ -82,36 +79,36 @@ namespace PhysSound
             else
                 _targetVolume = vol;
 
-            if (physSoundObject.PlayClipAtPoint && currAudioSource == null && _targetVolume > 0.001f)
+            if (_physSoundObject.PlayClipAtPoint && _currAudioSource == null && _targetVolume > 0.001f)
             {
-                _basePitchRand = _basePitch * soundMaterial.GetScaleModPitch(parentObject.transform.localScale) +
-                                 soundMaterial.GetRandomPitch();
+                _basePitchRand = _basePitch * SoundMaterial.GetScaleModPitch(parentObject.transform.localScale) +
+                                 SoundMaterial.GetRandomPitch();
 
-                currAudioSource = PhysSoundTempAudioPool.Instance.GetSource(SlideAudio);
+                _currAudioSource = PhysSoundTempAudioPool.Instance.GetSource(SlideAudio);
 
-                if (currAudioSource)
+                if (_currAudioSource)
                 {
-                    currAudioSource.clip = soundMaterial.GetAudioSet(KeyIndex).Slide;
-                    currAudioSource.volume = _targetVolume;
-                    currAudioSource.loop = true;
-                    currAudioSource.Play();
+                    _currAudioSource.clip = SoundMaterial.GetAudioSet(Key).Slide;
+                    _currAudioSource.volume = _targetVolume;
+                    _currAudioSource.loop = true;
+                    _currAudioSource.Play();
                 }
             }
-            else if (currAudioSource && !currAudioSource.isPlaying)
+            else if (_currAudioSource && !_currAudioSource.isPlaying)
             {
-                _basePitchRand = _basePitch * soundMaterial.GetScaleModPitch(parentObject.transform.localScale) +
-                                 soundMaterial.GetRandomPitch();
+                _basePitchRand = _basePitch * SoundMaterial.GetScaleModPitch(parentObject.transform.localScale) +
+                                 SoundMaterial.GetRandomPitch();
 
-                currAudioSource.loop = true;
-                currAudioSource.volume = _targetVolume;
-                currAudioSource.Play();
+                _currAudioSource.loop = true;
+                _currAudioSource.volume = _targetVolume;
+                _currAudioSource.Play();
             }
 
-            if (currAudioSource)
-                currAudioSource.pitch = _basePitchRand + relativeVelocity.magnitude * soundMaterial.SlidePitchMod;
+            if (_currAudioSource)
+                _currAudioSource.pitch = _basePitchRand + relativeVelocity.magnitude * SoundMaterial.SlidePitchMod;
 
-            if (soundMaterial.TimeScalePitch)
-                currAudioSource.pitch *= Time.timeScale;
+            if (SoundMaterial.TimeScalePitch)
+                _currAudioSource.pitch *= Time.timeScale;
 
             _lastExit = exit;
             _lastFrame = Time.frameCount;
@@ -122,22 +119,22 @@ namespace PhysSound
         /// </summary>
         public void UpdateVolume()
         {
-            if (SlideAudio == null || currAudioSource == null)
+            if (SlideAudio == null || _currAudioSource == null)
                 return;
 
-            currAudioSource.transform.position = physSoundObject.transform.position;
-            currAudioSource.volume = Mathf.MoveTowards(currAudioSource.volume, _targetVolume, 0.1f);
+            _currAudioSource.transform.position = _physSoundObject.transform.position;
+            _currAudioSource.volume = Mathf.MoveTowards(_currAudioSource.volume, _targetVolume, 0.1f);
 
-            if (currAudioSource.volume < 0.001f)
+            if (_currAudioSource.volume < 0.001f)
             {
-                if (physSoundObject.PlayClipAtPoint)
+                if (_physSoundObject.PlayClipAtPoint)
                 {
-                    PhysSoundTempAudioPool.Instance.ReleaseSource(currAudioSource);
-                    currAudioSource = null;
+                    PhysSoundTempAudioPool.Instance.ReleaseSource(_currAudioSource);
+                    _currAudioSource = null;
                 }
                 else
                 {
-                    currAudioSource.Stop();
+                    _currAudioSource.Stop();
                 }
             }
         }
@@ -145,9 +142,9 @@ namespace PhysSound
         /// <summary>
         /// Returns true if this Audio Container's key index is the same as the given key index.
         /// </summary>
-        public bool CompareKeyIndex(int k)
+        public bool CompareKeyIndex(PhysSoundKey k)
         {
-            return k == KeyIndex;
+            return k == Key;
         }
 
         /// <summary>

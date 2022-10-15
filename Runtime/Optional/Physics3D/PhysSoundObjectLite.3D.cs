@@ -1,39 +1,45 @@
+using UnityEngine;
+
 namespace PhysSound
 {
     public partial class PhysSoundObjectLite
     {
  #if PHYS_SOUND_3D
+
         #region 3D Collision Messages
 
-        Vector3 contactNormal, contactPoint, relativeVelocity;
+        private Vector3 _contactNormal;
+        private Vector3 _contactPoint;
+        private Vector3 _relativeVelocity;
 
-        void OnCollisionEnter(Collision c)
+        void OnCollisionEnter(Collision collision)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0)
+            if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0)
                 return;
 
-            contactNormal = c.contacts[0].normal;
-            contactPoint = c.contacts[0].point;
-            relativeVelocity = c.relativeVelocity;
+            _contactNormal = collision.GetContact(0).normal;
+            _contactPoint = collision.GetContact(0).point;
+            _relativeVelocity = collision.relativeVelocity;
 
-            playImpactSound(c.collider.gameObject, relativeVelocity, contactNormal, contactPoint);
+            PlayImpactSound(collision.collider, _relativeVelocity, _contactNormal, _contactPoint);
 
-            _setPrevVelocity = true;
+            SetPrevVelocity = true;
         }
 
         #endregion
 
         #region 3D Trigger Messages
 
-        void OnTriggerEnter(Collider c)
+        void OnTriggerEnter(Collider collider)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || !HitsTriggers)
+            if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 || !HitsTriggers)
                 return;
 
-            playImpactSound(c.gameObject, TotalKinematicVelocity, Vector3.zero, c.transform.position);
+            PlayImpactSound(collider, TotalKinematicVelocity, Vector3.zero, collider.transform.position);
         }
 
         #endregion
+
 #endif
     }
 }

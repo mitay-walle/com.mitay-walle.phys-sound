@@ -13,37 +13,37 @@ namespace PhysSound
             if (ImpactAudio && !ImpactAudio.isPlaying)
                 ImpactAudio.Stop();
 
-            _kinematicVelocity = (transform.position - _prevPosition) / Time.deltaTime;
-            _prevPosition = transform.position;
+            KinematicVelocity = (transform.position - PrevPosition) / Time.deltaTime;
+            PrevPosition = transform.position;
 
-            _kinematicAngularVelocity = Quaternion.Angle(_prevRotation, transform.rotation) / Time.deltaTime / 45f;
-            _prevRotation = transform.rotation;
+            KinematicAngularVelocity = Quaternion.Angle(PrevRotation, transform.rotation) / Time.deltaTime / 45f;
+            PrevRotation = transform.rotation;
         }
 
         /// <summary>
         /// Initializes the PhysSoundObject. Use this if you adding a PhysSoundObject component to an object at runtime.
         /// </summary>
-        public override void Initialize()
+        override protected void Initialize()
         {
 #if PHYS_SOUND_3D
             _r = GetComponent<Rigidbody>();
 #endif
-#if PHYS_SOUND_3D
+#if PHYS_SOUND_2D
             _r2D = GetComponent<Rigidbody2D>();
 #endif
 
             if (AutoCreateSources)
             {
-                baseImpactVol = ImpactAudio.volume;
-                baseImpactPitch = ImpactAudio.pitch;
+                BaseImpactVol = ImpactAudio.volume;
+                BaseImpactPitch = ImpactAudio.pitch;
 
                 ImpactAudio.loop = false;
             }
             else if (ImpactAudio)
             {
                 ImpactAudio.loop = false;
-                baseImpactVol = ImpactAudio.volume;
-                baseImpactPitch = ImpactAudio.pitch;
+                BaseImpactVol = ImpactAudio.volume;
+                BaseImpactPitch = ImpactAudio.pitch;
             }
 
             if (PlayClipAtPoint)

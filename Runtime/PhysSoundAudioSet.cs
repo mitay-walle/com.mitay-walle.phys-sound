@@ -6,7 +6,7 @@ namespace PhysSound
     [System.Serializable]
     public class PhysSoundAudioSet
     {
-        public int Key;
+        public PhysSoundKey Key;
         public List<AudioClip> Impacts = new List<AudioClip>();
         public AudioClip Slide;
 
@@ -32,7 +32,7 @@ namespace PhysSound
         /// <summary>
         /// Returns true if this Audio Set's key index is the same as the given key index.
         /// </summary>
-        public bool CompareKeyIndex(int k)
+        public bool CompareKey(PhysSoundKey k)
         {
             return Key == k;
         }
