@@ -11,10 +11,8 @@ namespace PhysSound
         [SerializeField] private List<PhysSoundMaterial> _materials = new List<PhysSoundMaterial>();
         [SerializeField] private List<PhysSoundKey> _keys = new List<PhysSoundKey>();
 
-        private Dictionary<PhysicMaterial, PhysSoundKey> _keysMap = new Dictionary<PhysicMaterial, PhysSoundKey>();
-
-        private Dictionary<PhysicsMaterial2D, PhysSoundKey> _keysMap2D =
-            new Dictionary<PhysicsMaterial2D, PhysSoundKey>();
+        public Physic2DModule Physic2D = new Physic2DModule();
+        public Physic3DModule Physic3D = new Physic3DModule();
 
         private void OnEnable() => Init();
 
@@ -27,43 +25,8 @@ namespace PhysSound
                 physSoundMaterial.Init();
             }
 
-            _keysMap.Clear();
-            foreach (PhysSoundKey key in _keys)
-            {
-                for (int i = 0; i < key.PhysicMterials.Count; i++)
-                {
-                    _keysMap.Add(key.PhysicMterials[i], key);
-                }
-            }
-
-            _keysMap2D.Clear();
-            foreach (PhysSoundKey key in _keys)
-            {
-                for (int i = 0; i < key.PhysicMterials2D.Count; i++)
-                {
-                    _keysMap2D.Add(key.PhysicMterials2D[i], key);
-                }
-            }
-        }
-
-        public PhysSoundKey GetSoundMaterial(PhysicMaterial physicMaterial)
-        {
-            if (_keysMap.TryGetValue(physicMaterial, out PhysSoundKey physSoundKey))
-            {
-                return physSoundKey;
-            }
-
-            return null;
-        }
-
-        public PhysSoundKey GetSoundMaterial(PhysicsMaterial2D physicMaterial)
-        {
-            if (_keysMap2D.TryGetValue(physicMaterial, out PhysSoundKey physSoundKey))
-            {
-                return physSoundKey;
-            }
-
-            return null;
+            Physic3D.Init(_keys);
+            Physic2D.Init(_keys);
         }
 
         [ContextMenu(("Collect all"))]
@@ -82,6 +45,68 @@ namespace PhysSound
                 .ToList();
 #endif
             return null;
+        }
+    }
+
+    public class Physic3DModule
+    {
+#if PHYS_SOUND_3D
+
+        private Dictionary<PhysicMaterial, PhysSoundKey> _keysMap = new Dictionary<PhysicMaterial, PhysSoundKey>();
+
+        public PhysSoundKey GetSoundMaterial(PhysicMaterial physicMaterial)
+        {
+            if (_keysMap.TryGetValue(physicMaterial, out PhysSoundKey physSoundKey))
+            {
+                return physSoundKey;
+            }
+
+            return null;
+        }
+#endif
+        public void Init(List<PhysSoundKey> keys)
+        {
+#if PHYS_SOUND_3D
+            _keysMap.Clear();
+            foreach (PhysSoundKey key in keys)
+            {
+                for (int i = 0; i < key.PhysicMterials.Count; i++)
+                {
+                    _keysMap.Add(key.PhysicMterials[i], key);
+                }
+            }
+#endif
+        }
+    }
+
+    public class Physic2DModule
+    {
+#if PHYS_SOUND_2D
+        private Dictionary<PhysicsMaterial2D, PhysSoundKey> _keysMap2D =
+ new Dictionary<PhysicsMaterial2D, PhysSoundKey>();
+
+            public PhysSoundKey GetSoundMaterial(PhysicsMaterial2D physicMaterial)
+        {
+            if (_keysMap2D.TryGetValue(physicMaterial, out PhysSoundKey physSoundKey))
+            {
+                return physSoundKey;
+            }
+
+            return null;
+        }
+#endif
+        public void Init(List<PhysSoundKey> keys)
+        {
+#if PHYS_SOUND_2D
+            _keysMap2D.Clear();
+            foreach (PhysSoundKey key in keys)
+            {
+                for (int i = 0; i < key.PhysicMterials2D.Count; i++)
+                {
+                    _keysMap2D.Add(key.PhysicMterials2D[i], key);
+                }
+            }
+#endif
         }
     }
 }

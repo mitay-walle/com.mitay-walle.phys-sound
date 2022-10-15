@@ -22,12 +22,6 @@ namespace PhysSound
 
         protected Vector3 TotalKinematicVelocity => KinematicVelocity + (Vector3.one * KinematicAngularVelocity);
 
-#if PHYS_SOUND_3D
-        protected Rigidbody _r;
-#endif
-#if PHYS_SOUND_2D
-        protected Rigidbody2D _r2D;
-#endif
         private void Start()
         {
             if (SoundMaterial == null)
@@ -41,7 +35,9 @@ namespace PhysSound
         public abstract void SetEnabled(bool enabled);
 
         protected abstract void Initialize();
-
+        
+#if PHYS_SOUND_3D
+        protected Rigidbody _r;
         protected void PlayImpactSound(Collider other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {
             if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 || Time.frameCount == LastFrame)
@@ -57,7 +53,10 @@ namespace PhysSound
                 PlayImpactSound(clip, relativeVelocity, normal, contactPoint);
             }
         }
+#endif
 
+#if PHYS_SOUND_2D
+        protected Rigidbody2D _r2D;
         protected void PlayImpactSound(Collider2D other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {
             if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 || Time.frameCount == LastFrame)
@@ -73,6 +72,7 @@ namespace PhysSound
                 PlayImpactSound(clip, relativeVelocity, normal, contactPoint);
             }
         }
+#endif
 
         protected void PlayImpactSound(AudioClip clip, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {

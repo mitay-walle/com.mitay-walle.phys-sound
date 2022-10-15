@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6091bb5de091b054d8bca4fdcf9bbbec, type: 3}
+  m_Name: _PhysSound Database
+  m_EditorClassIdentifier: 
+  _materials:
+  - {fileID: 11400000, guid: 2e66c367b86139d4fb543795535ceb9d, type: 2}
+  - {fileID: 11400000, guid: 11294f88b0d3b664c85c17340dabc34b, type: 2}
+  - {fileID: 11400000, guid: 232fb3b36001b77459ea5b9edae943d1, type: 2}
+  - {fileID: 11400000, guid: 279769e014b628a448f959dc91a72e14, type: 2}
+  - {fileID: 11400000, guid: 48274210e482b704093d8f8c8453c57f, type: 2}
+  - {fileID: 11400000, guid: 6f7089a758c0833478207d0bd3b83683, type: 2}
+  - {fileID: 11400000, guid: 7d2fb4e87e73c354b998451c2ce492c1, type: 2}
+  _keys:
+  - {fileID: 11400000, guid: e46ed031ebe4ebc4bbb399527740adfb, type: 2}
+  - {fileID: 11400000, guid: be8bad734ade8754b9f3c5f934b90783, type: 2}

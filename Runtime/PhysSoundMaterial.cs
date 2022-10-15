@@ -4,6 +4,7 @@ using PhysSound.Utilities;
 
 namespace PhysSound
 {
+    [CreateAssetMenu(menuName = "Phys Sound/Material")]
     public class PhysSoundMaterial : ScriptableObject
     {
         public PhysSoundKey MaterialTypeKey;
@@ -47,25 +48,27 @@ namespace PhysSound
             }
         }
 
+#if PHYS_SOUND_3D
         public AudioClip GetImpactAudio(Collider other, Vector3 relativeVel, Vector3 norm, Vector3 contact)
         {
             if (!CanCollideAudioWith(other.gameObject))
                 return null;
 
             PhysSoundBase otherPhysSoundComponent = other.GetComponent<PhysSoundBase>();
-            PhysSoundKey soundKey = null;
 
             if (otherPhysSoundComponent)
             {
                 PhysSoundMaterial soundMaterial = otherPhysSoundComponent.GetPhysSoundMaterial(contact);
-                soundKey = soundMaterial.MaterialTypeKey;
+                PhysSoundKey soundKey = soundMaterial.MaterialTypeKey;
                 return GetImpactAudio(soundKey, relativeVel, norm, contact);
             }
 
-            PhysSoundKey key = _database.GetSoundMaterial(other.sharedMaterial);
+            PhysSoundKey key = _database.Physic3D.GetSoundMaterial(other.sharedMaterial);
             return GetImpactAudio(key, relativeVel, norm, contact);
         }
+#endif
 
+#if PHYS_SOUND_2D
         public AudioClip GetImpactAudio(Collider2D other, Vector3 relativeVel, Vector3 norm, Vector3 contact)
         {
             if (!CanCollideAudioWith(other.gameObject))
@@ -80,9 +83,10 @@ namespace PhysSound
                 return GetImpactAudio(soundKey, relativeVel, norm, contact);
             }
 
-            PhysSoundKey key = _database.GetSoundMaterial(other.sharedMaterial);
+            PhysSoundKey key = _database.Physic2D.GetSoundMaterial(other.sharedMaterial);
             return GetImpactAudio(key, relativeVel, norm, contact);
         }
+#endif
 
         private AudioClip GetImpactAudio(PhysSoundKey soundKey, Vector3 relativeVel, Vector3 norm,
             Vector3 contact)

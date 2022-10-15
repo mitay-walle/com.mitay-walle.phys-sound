@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1a46b85acec488479294b28044c0b36, type: 3}
+  m_Name: Metal
+  m_EditorClassIdentifier: 
+  MaterialTypeKey: {fileID: 11400000, guid: e46ed031ebe4ebc4bbb399527740adfb, type: 2}
+  FallbackTypeKey: {fileID: 11400000, guid: e46ed031ebe4ebc4bbb399527740adfb, type: 2}
+  _database: {fileID: 11400000, guid: 9935a0afc0ba39b4983c771a5633ba37, type: 2}
+  TimeScalePitch: 0
+  ScaleImpactVolume: 1
+  SlidePitchMod: 0.01
+  VolumeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  CollisionMask:
+    serializedVersion: 2
+    m_Bits: 55
+  RelativeVelocityThreshold:
+    Min: 2
+    Max: 8
+  PitchRandomness: 0.15
+  SlideVolMultiplier: 1
+  ImpactNormalBias: 0.75
+  ScaleMod: 0.5
+  UseCollisionVelocity: 1
+  AudioSets:
+  - Key: {fileID: 11400000, guid: e46ed031ebe4ebc4bbb399527740adfb, type: 2}
+    Impacts:
+    - {fileID: 8300000, guid: 195f8e867e5d20b4e9bda2ade106e1ad, type: 3}
+    - {fileID: 8300000, guid: fb02e8a0e267ea7479c9b463d692210a, type: 3}
+    - {fileID: 8300000, guid: 11e15e4daf03afa4f898076b6ad3e723, type: 3}
+    - {fileID: 8300000, guid: 4d47c7fa086cc3a458d398ef25ff1c1a, type: 3}
+    Slide: {fileID: 8300000, guid: 2ce09e8da31fb4d40ae16909be53ac1c, type: 3}
+  - Key: {fileID: 11400000, guid: be8bad734ade8754b9f3c5f934b90783, type: 2}
+    Impacts:
+    - {fileID: 8300000, guid: b0d20a37345d4904f80f7f03e1fb3981, type: 3}
+    - {fileID: 8300000, guid: 93137abaf7e01c346954287ef3bd09f0, type: 3}
+    - {fileID: 8300000, guid: 4ac074a0095fe504da28811ebe9955d7, type: 3}
+    - {fileID: 8300000, guid: eb2342eae85500646b83a3011ae8da52, type: 3}
+    Slide: {fileID: 0}

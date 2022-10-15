@@ -17,9 +17,14 @@
   "author": "mitay-walle <mitay-walle91@mail.ru> (https://github.com/mitay-walle)",
   "samples": [
     {
-      "displayName": "Examples",
+      "displayName": "Examples 3D",
       "description": "",
-      "path": "Samples~"
+      "path": "Samples/Samples3D~"
+    },
+	   {
+      "displayName": "Examples 2D",
+      "description": "",
+      "path": "Samples/Samples2D~"
     }
   ]
 }
