@@ -565,7 +565,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: 4ac7a765b7e767545a5919d28cac0a03, type: 2}
+  m_Material: {fileID: 6200000, guid: 2b2c8ff97e365754f87abecf68994fb3, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -1859,7 +1859,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: fd896a388f894a64da5ad414a5c00e9e, type: 2}
+  m_Material: {fileID: 6200000, guid: 20b108964882f0b418d3b783cee015c2, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -2107,7 +2107,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: 1f7ce654f3373414cb1f478d12dfe199, type: 2}
+  m_Material: {fileID: 6200000, guid: 3f36024c6d125484bbd84228ee52741c, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -2471,7 +2471,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: 7404c623484d0d544b89237a770c92ba, type: 2}
+  m_Material: {fileID: 6200000, guid: 1419696bdb3682c4486964076ee66b75, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -2693,7 +2693,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: 0d49d78e97efb8842ad64e7831bc31ea, type: 2}
+  m_Material: {fileID: 6200000, guid: 4ffc4114599e81640a5e60927ce5e880, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
