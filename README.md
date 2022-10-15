@@ -13,5 +13,11 @@ Optional modules dependent to unity built-in modules:
 - 2D Collision events
 - 3D Collision events
 
+## Overview ##
+- Recursive Fallback Materials
+- 2D Samples scene
+- 2D Trigger sample
+- 3D Samples scene
+
 
 ![](https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/Documentation/Screenshot_1.png)
