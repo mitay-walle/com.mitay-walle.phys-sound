@@ -4,7 +4,6 @@
 
 The PhysSound system adds the ability to bring your physics to life through the use of impact and sliding
 sounds. The system works with both 2D and 3D physics.
-There are 3 parts of the system: PhysSound Material Types, PhysSound Materials, PhysSound Objects.
 
 Install [by Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 
@@ -19,5 +18,17 @@ Optional modules dependent to unity built-in modules:
 - 2D Trigger sample
 - 3D Samples scene
 
+There are 4 parts of the system: 
+- PhysSoundDatabase : ScriptableObject
+
+![](https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/Documentation/Screenshot_2.png)
+- PhysSoundKey : ScriptableObject
+
+![](https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/Documentation/Screenshot_4.png)
+- PhysSoundMaterial : ScriptableObject
 
 ![](https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/Documentation/Screenshot_1.png)
+
+- PhysSoundObject : MonoBehaviour
+
+![](https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/Documentation/Screenshot_3.png)
