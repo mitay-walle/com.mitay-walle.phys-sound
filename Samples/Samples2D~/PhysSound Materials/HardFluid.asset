@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1a46b85acec488479294b28044c0b36, type: 3}
-  m_Name: Wood
+  m_Name: HardFluid
   m_EditorClassIdentifier: 
-  MaterialTypeKey: {fileID: 11400000, guid: 6e477dee3433fa84b91c87955da70757, type: 2}
-  Fallback: {fileID: 11400000, guid: 8c8398a26395dcf4c9803c55d64d3263, type: 2}
+  MaterialTypeKey: {fileID: 11400000, guid: 9190931b61586174591b4e3182d1072c, type: 2}
+  Fallback: {fileID: 0}
   _database: {fileID: 11400000, guid: 511756466eef4a941adfd588bace243f, type: 2}
   TimeScalePitch: 0
   ScaleImpactVolume: 0
@@ -46,11 +46,25 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 55
   RelativeVelocityThreshold:
-    Min: 0
-    Max: 0
+    Min: 1
+    Max: 10
   PitchRandomness: 0.1
   SlideVolMultiplier: 1
   ImpactNormalBias: 1
   ScaleMod: 0.15
   UseCollisionVelocity: 0
-  AudioSets: []
+  AudioSets:
+  - Key: {fileID: 11400000, guid: 9190931b61586174591b4e3182d1072c, type: 2}
+    Impacts:
+    - {fileID: 8300000, guid: 7d10c973bb8438e40bfeafdce1e85260, type: 3}
+    - {fileID: 8300000, guid: 9ccbb5f197ce7564bad005b5e77ae8cc, type: 3}
+    - {fileID: 8300000, guid: af70920d763307643a56c243a424528c, type: 3}
+    - {fileID: 8300000, guid: 309acf9ccc682444db34c8a5abf83fde, type: 3}
+    - {fileID: 8300000, guid: 8d63208b0ce0e824bb8ef324bb658644, type: 3}
+    - {fileID: 8300000, guid: 4d2652410e879484485a6e0f32caad79, type: 3}
+    - {fileID: 8300000, guid: 1db755a8ca9fc79469da5e7fb76eff14, type: 3}
+    - {fileID: 8300000, guid: 9ec2cb91f4b0a204da18b07fac439433, type: 3}
+    - {fileID: 8300000, guid: 2c9951acf7a0de640b83e42b5d63f25f, type: 3}
+    - {fileID: 8300000, guid: fd0780bf4c5255d48b1499e7bb564564, type: 3}
+    - {fileID: 8300000, guid: 90f440bedce948f419adb338df364711, type: 3}
+    Slide: {fileID: 0}

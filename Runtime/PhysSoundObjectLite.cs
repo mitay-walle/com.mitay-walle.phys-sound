@@ -5,7 +5,7 @@ namespace PhysSound
     [AddComponentMenu("PhysSound/PhysSound Object Lite")]
     public partial class PhysSoundObjectLite : PhysSoundObjectBase
     {
-        void Update()
+        private void FixedUpdate()
         {
             if (SoundMaterial == null)
                 return;

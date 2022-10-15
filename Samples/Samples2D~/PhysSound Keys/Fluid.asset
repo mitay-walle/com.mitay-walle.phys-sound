@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f88609f0e8a40428f34a36500b47064, type: 3}
+  m_Name: Fluid
+  m_EditorClassIdentifier: 
+  PhysicMterials: []
+  PhysicMterials2D:
+  - {fileID: 6200000, guid: 1299b3bc15df4f1409359cbe289615a6, type: 2}

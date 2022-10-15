@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Rock
   m_EditorClassIdentifier: 
   MaterialTypeKey: {fileID: 11400000, guid: 6e477dee3433fa84b91c87955da70757, type: 2}
-  FallbackTypeKey: {fileID: 11400000, guid: 6e477dee3433fa84b91c87955da70757, type: 2}
+  Fallback: {fileID: 11400000, guid: 8c8398a26395dcf4c9803c55d64d3263, type: 2}
   _database: {fileID: 11400000, guid: 511756466eef4a941adfd588bace243f, type: 2}
   TimeScalePitch: 0
   ScaleImpactVolume: 1

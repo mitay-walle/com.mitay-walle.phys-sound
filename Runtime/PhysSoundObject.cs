@@ -104,7 +104,7 @@ namespace PhysSound
             return null;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (SoundMaterial == null)
                 return;
@@ -192,16 +192,16 @@ namespace PhysSound
                 return;
             }
 
-            PhysSoundMaterial m = null;
-            PhysSoundBase b = otherObject == null ? null : otherObject.GetComponent<PhysSoundBase>();
+            PhysSoundMaterial material = null;
+            PhysSoundBase component = otherObject == null ? null : otherObject.GetComponent<PhysSoundBase>();
 
-            if (b)
+            if (component)
             {
 #if PHYS_SOUND_TERRAIN
                 //Special case for sliding against a terrain
-                if (b is PhysSoundTerrain)
+                if (component is PhysSoundTerrain)
                 {
-                    PhysSoundTerrain terr = b as PhysSoundTerrain;
+                    PhysSoundTerrain terr = component as PhysSoundTerrain;
                     var compDic = terr.GetComposition(contactPoint);
 
                     foreach (PhysSoundAudioContainer c in _audioContainersMap.Values)
@@ -218,21 +218,21 @@ namespace PhysSound
                     return;
                 }
                 else
-                    m = b.GetPhysSoundMaterial(contactPoint);
+                    material = component.GetPhysSoundMaterial(contactPoint);
 #endif
             }
 
             //If the other object has a PhysSound material
-            if (m)
+            if (material)
             {
-                if (_audioContainersMap.TryGetValue(m.MaterialTypeKey, out PhysSoundAudioContainer aud))
+                if (_audioContainersMap.TryGetValue(material.MaterialTypeKey, out PhysSoundAudioContainer aud))
                 {
                     aud.SetTargetVolumeAndPitch(gameObject, otherObject, relativeVelocity, normal, exit);
                 }
                 else
                 {
-                    if (!SoundMaterial.HasAudioSet(m.MaterialTypeKey) && SoundMaterial.FallbackTypeKey != null &&
-                        _audioContainersMap.TryGetValue(SoundMaterial.FallbackTypeKey, out aud))
+                    if (!SoundMaterial.HasAudioSet(material.MaterialTypeKey) && SoundMaterial.Fallback != null &&
+                        _audioContainersMap.TryGetValue(SoundMaterial.Fallback?.MaterialTypeKey, out aud))
                     {
                         aud.SetTargetVolumeAndPitch(gameObject, otherObject, relativeVelocity, normal, exit);
                     }
@@ -242,8 +242,8 @@ namespace PhysSound
             {
                 //If it doesnt we set volumes based on the fallback setting of our material
 
-                if (SoundMaterial.FallbackTypeKey != null &&
-                    _audioContainersMap.TryGetValue(SoundMaterial.FallbackTypeKey, out PhysSoundAudioContainer aud))
+                if (SoundMaterial.Fallback != null &&
+                    _audioContainersMap.TryGetValue(SoundMaterial.Fallback?.MaterialTypeKey, out PhysSoundAudioContainer aud))
                 {
                     aud.SetTargetVolumeAndPitch(gameObject, otherObject, relativeVelocity, normal, exit);
                 }

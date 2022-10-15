@@ -8,7 +8,7 @@ namespace PhysSound
     public class PhysSoundMaterial : ScriptableObject
     {
         public PhysSoundKey MaterialTypeKey;
-        public PhysSoundKey FallbackTypeKey;
+        public PhysSoundMaterial Fallback;
         [SerializeField] protected PhysSoundDatabase _database;
 
         public bool TimeScalePitch;
@@ -49,7 +49,7 @@ namespace PhysSound
         }
 
 #if PHYS_SOUND_3D
-        public AudioClip GetImpactAudio(Collider other, Vector3 relativeVel, Vector3 norm, Vector3 contact)
+        public AudioClip GetImpactAudio(Collider other, Vector3 relativeVel, Vector3 normal, Vector3 contact)
         {
             if (!CanCollideAudioWith(other.gameObject))
                 return null;
@@ -60,16 +60,16 @@ namespace PhysSound
             {
                 PhysSoundMaterial soundMaterial = otherPhysSoundComponent.GetPhysSoundMaterial(contact);
                 PhysSoundKey soundKey = soundMaterial.MaterialTypeKey;
-                return GetImpactAudio(soundKey, relativeVel, norm, contact);
+                return GetImpactRecursive(soundKey, relativeVel, normal);
             }
 
             PhysSoundKey key = _database.Physic3D.GetSoundMaterial(other.sharedMaterial);
-            return GetImpactAudio(key, relativeVel, norm, contact);
+            return GetImpactRecursive(key, relativeVel, normal);
         }
 #endif
 
 #if PHYS_SOUND_2D
-        public AudioClip GetImpactAudio(Collider2D other, Vector3 relativeVel, Vector3 norm, Vector3 contact)
+        public AudioClip GetImpactAudio(Collider2D other, Vector3 relativeVel, Vector3 normal, Vector3 contact)
         {
             if (!CanCollideAudioWith(other.gameObject))
                 return null;
@@ -80,72 +80,35 @@ namespace PhysSound
             {
                 PhysSoundMaterial soundMaterial = otherPhysSoundComponent.GetPhysSoundMaterial(contact);
                 PhysSoundKey soundKey = soundMaterial.MaterialTypeKey;
-                return GetImpactAudio(soundKey, relativeVel, norm, contact);
+                return GetImpactRecursive(soundKey, relativeVel, normal);
             }
 
             PhysSoundKey key = _database.Physic2D.GetSoundMaterial(other.sharedMaterial);
-            return GetImpactAudio(key, relativeVel, norm, contact);
+            return GetImpactRecursive(key, relativeVel, normal);
         }
 #endif
 
-        private AudioClip GetImpactAudio(PhysSoundKey soundKey, Vector3 relativeVel, Vector3 norm,
-            Vector3 contact)
+        private AudioClip GetImpactRecursive(PhysSoundKey key, Vector3 relativeVel, Vector3 normal)
         {
-            if (_audioSetDic == null)
-                return null;
+            Debug.Log($"GetImpactRecursive {key?.name}");
 
-            float velNorm = GetImpactVolume(relativeVel, norm);
-            if (velNorm <= 0)
-                return null;
-
-            if (UseCollisionVelocity)
+            bool random = !UseCollisionVelocity;
+            if (key && _audioSetDic.ContainsKey(key))
             {
-                //Get sounds using collision velocity
-                if (soundKey)
+                float velNorm = GetImpactVolume(relativeVel, normal);
+                if (velNorm <= 0)
                 {
-                    if (_audioSetDic.TryGetValue(soundKey, out PhysSoundAudioSet audSet))
-                    {
-                        return audSet.GetImpact(velNorm, false);
-                    }
+                    Debug.Log($"return velNorm <= 0");
 
-                    if (FallbackTypeKey != null)
-                    {
-                        return _audioSetDic[FallbackTypeKey].GetImpact(velNorm, false);
-                    }
+                    return null;
                 }
-                else
-                {
-                    if (FallbackTypeKey != null)
-                    {
-                        return _audioSetDic[FallbackTypeKey].GetImpact(velNorm, false);
-                    }
-                }
-            }
-            else
-            {
-                //Get sound randomly
-                if (soundKey)
-                {
-                    if (_audioSetDic.TryGetValue(soundKey, out PhysSoundAudioSet audSet))
-                    {
-                        return audSet.GetImpact(0, true);
-                    }
 
-                    if (FallbackTypeKey != null)
-                    {
-                        return _audioSetDic[FallbackTypeKey].GetImpact(0, true);
-                    }
-                }
-                else
-                {
-                    if (FallbackTypeKey != null)
-                    {
-                        return _audioSetDic[FallbackTypeKey].GetImpact(0, true);
-                    }
-                }
+                velNorm = UseCollisionVelocity ? velNorm : 0;
+
+                return _audioSetDic[key].GetImpact(velNorm, random);
             }
 
-            return null;
+            return Fallback != null ? Fallback.GetImpactRecursive(key, relativeVel, normal) : null;
         }
 
         /// <summary>

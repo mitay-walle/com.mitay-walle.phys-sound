@@ -66,6 +66,7 @@ namespace PhysSound
 
             if (!ImpactAudio) return;
 
+
             AudioClip clip = SoundMaterial.GetImpactAudio(other, relativeVelocity, normal, contactPoint);
             if (clip)
             {
