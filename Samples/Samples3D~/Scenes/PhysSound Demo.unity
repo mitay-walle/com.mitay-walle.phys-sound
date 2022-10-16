@@ -542,9 +542,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SoundMaterial: {fileID: 11400000, guid: 279769e014b628a448f959dc91a72e14, type: 2}
-  ImpactAudio: {fileID: 134529033}
-  AutoCreateSources: 0
-  HitsTriggers: 0
+  _impactAudio: {fileID: 134529033}
+  _collisionEvents:
+    PlayOnCollisionEnter: 1
+    PlayOnCollisionStay: 0
+    SlideOnCollisionStay: 1
+    PlayOnTriggerEnter: 1
+  _autoCreateSources: 0
   PlayClipAtPoint: 1
   AudioContainers:
   - Key: {fileID: 11400000, guid: be8bad734ade8754b9f3c5f934b90783, type: 2}
@@ -1560,9 +1564,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SoundMaterial: {fileID: 11400000, guid: 11294f88b0d3b664c85c17340dabc34b, type: 2}
-  ImpactAudio: {fileID: 1234920554}
-  AutoCreateSources: 0
-  HitsTriggers: 0
+  _impactAudio: {fileID: 1234920554}
+  _collisionEvents:
+    PlayOnCollisionEnter: 1
+    PlayOnCollisionStay: 0
+    SlideOnCollisionStay: 0
+    PlayOnTriggerEnter: 1
+  _autoCreateSources: 0
   PlayClipAtPoint: 1
   AudioContainers: []
 --- !u!65 &1233582724
@@ -1790,9 +1798,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SoundMaterial: {fileID: 11400000, guid: 6f7089a758c0833478207d0bd3b83683, type: 2}
-  ImpactAudio: {fileID: 1375342218}
-  AutoCreateSources: 1
-  HitsTriggers: 0
+  _impactAudio: {fileID: 1375342218}
+  _collisionEvents:
+    PlayOnCollisionEnter: 1
+    PlayOnCollisionStay: 0
+    SlideOnCollisionStay: 0
+    PlayOnTriggerEnter: 1
+  _autoCreateSources: 0
   PlayClipAtPoint: 1
   AudioContainers: []
 --- !u!23 &1368158785
@@ -2130,9 +2142,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SoundMaterial: {fileID: 11400000, guid: 2e66c367b86139d4fb543795535ceb9d, type: 2}
-  ImpactAudio: {fileID: 1541795221}
-  AutoCreateSources: 1
-  HitsTriggers: 0
+  _impactAudio: {fileID: 1541795221}
+  _collisionEvents:
+    PlayOnCollisionEnter: 1
+    PlayOnCollisionStay: 0
+    SlideOnCollisionStay: 0
+    PlayOnTriggerEnter: 1
+  _autoCreateSources: 0
   PlayClipAtPoint: 1
   AudioContainers: []
 --- !u!54 &1538365818
@@ -2347,9 +2363,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SoundMaterial: {fileID: 11400000, guid: 48274210e482b704093d8f8c8453c57f, type: 2}
-  ImpactAudio: {fileID: 1559961692}
-  AutoCreateSources: 1
-  HitsTriggers: 0
+  _impactAudio: {fileID: 1559961692}
+  _collisionEvents:
+    PlayOnCollisionEnter: 1
+    PlayOnCollisionStay: 1
+    SlideOnCollisionStay: 1
+    PlayOnTriggerEnter: 1
+  _autoCreateSources: 0
   PlayClipAtPoint: 1
   AudioContainers: []
 --- !u!23 &1552758971

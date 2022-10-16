@@ -10,14 +10,14 @@ namespace PhysSound
             if (SoundMaterial == null)
                 return;
 
-            if (ImpactAudio && !ImpactAudio.isPlaying)
-                ImpactAudio.Stop();
+            if (_impactAudio && !_impactAudio.isPlaying)
+                _impactAudio.Stop();
 
-            KinematicVelocity = (transform.position - PrevPosition) / Time.deltaTime;
-            PrevPosition = transform.position;
+            _kinematicVelocity = (transform.position - _prevPosition) / Time.deltaTime;
+            _prevPosition = transform.position;
 
-            KinematicAngularVelocity = Quaternion.Angle(PrevRotation, transform.rotation) / Time.deltaTime / 45f;
-            PrevRotation = transform.rotation;
+            _kinematicAngularVelocity = Quaternion.Angle(_prevRotation, transform.rotation) / Time.deltaTime / 45f;
+            _prevRotation = transform.rotation;
         }
 
         /// <summary>
@@ -32,24 +32,24 @@ namespace PhysSound
             _r2D = GetComponent<Rigidbody2D>();
 #endif
 
-            if (AutoCreateSources)
+            if (_autoCreateSources)
             {
-                BaseImpactVol = ImpactAudio.volume;
-                BaseImpactPitch = ImpactAudio.pitch;
+                _baseImpactVol = _impactAudio.volume;
+                _baseImpactPitch = _impactAudio.pitch;
 
-                ImpactAudio.loop = false;
+                _impactAudio.loop = false;
             }
-            else if (ImpactAudio)
+            else if (_impactAudio)
             {
-                ImpactAudio.loop = false;
-                BaseImpactVol = ImpactAudio.volume;
-                BaseImpactPitch = ImpactAudio.pitch;
+                _impactAudio.loop = false;
+                _baseImpactVol = _impactAudio.volume;
+                _baseImpactPitch = _impactAudio.pitch;
             }
 
             if (PlayClipAtPoint)
                 PhysSoundTempAudioPool.Create();
-            else if (ImpactAudio != null && !ImpactAudio.isActiveAndEnabled)
-                ImpactAudio = PhysSoundTempAudioPool.GetAudioSourceCopy(ImpactAudio, gameObject);
+            else if (_impactAudio != null && !_impactAudio.isActiveAndEnabled)
+                _impactAudio = PhysSoundTempAudioPool.GetAudioSourceCopy(_impactAudio, gameObject);
         }
 
         /// <summary>
@@ -59,15 +59,15 @@ namespace PhysSound
         {
             if (enable && this.enabled == false)
             {
-                ImpactAudio.enabled = true;
+                _impactAudio.enabled = true;
                 this.enabled = true;
             }
             else if (!enable && this.enabled == true)
             {
-                if (ImpactAudio)
+                if (_impactAudio)
                 {
-                    ImpactAudio.Stop();
-                    ImpactAudio.enabled = false;
+                    _impactAudio.Stop();
+                    _impactAudio.enabled = false;
                 }
 
                 this.enabled = false;

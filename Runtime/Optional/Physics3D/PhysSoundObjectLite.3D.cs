@@ -21,9 +21,10 @@ namespace PhysSound
             _contactPoint = collision.GetContact(0).point;
             _relativeVelocity = collision.relativeVelocity;
 
-            PlayImpactSound(collision.collider, _relativeVelocity, _contactNormal, _contactPoint);
+            if (_collisionEvents.PlayOnCollisionEnter)
+                PlayImpactSound(collision.collider, _relativeVelocity, _contactNormal, _contactPoint);
 
-            SetPrevVelocity = true;
+            _setPrevVelocity = true;
         }
 
         #endregion
@@ -32,7 +33,8 @@ namespace PhysSound
 
         void OnTriggerEnter(Collider collider)
         {
-            if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 || !HitsTriggers)
+            if (!_collisionEvents.PlayOnTriggerEnter || SoundMaterial == null || !enabled ||
+                SoundMaterial.AudioSets.Count == 0)
                 return;
 
             PlayImpactSound(collider, TotalKinematicVelocity, Vector3.zero, collider.transform.position);

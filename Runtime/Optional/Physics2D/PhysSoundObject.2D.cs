@@ -6,78 +6,94 @@ namespace PhysSound
     public partial class PhysSoundObject
     {
         #if PHYS_SOUND_2D
-         
+
         #region 2D Collision Messages
 
-        void OnCollisionEnter2D(Collision2D c)
+        private void OnCollisionEnter2D(Collision2D c)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0)
+            if (SoundMaterial == null || !enabled ||
+                SoundMaterial.AudioSets.Count == 0)
                 return;
 
-            PlayImpactSound(c.collider, c.relativeVelocity, c.GetContact(0).normal, c.GetContact(0).point);
+            if (_collisionEvents.PlayOnCollisionEnter)
+                PlayImpactSound(c.collider, c.relativeVelocity, c.GetContact(0).normal, c.GetContact(0).point);
 
-            SetPrevVelocity = true;
+            _setPrevVelocity = true;
         }
 
-        void OnCollisionStay2D(Collision2D c)
+        public void OnCollisionStay2DInternal(Collision2D c)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 ||
+            if (SoundMaterial == null || !enabled ||
+                SoundMaterial.AudioSets.Count == 0 ||
                 _audioContainersMap == null)
                 return;
 
-            if (SetPrevVelocity)
+            if (_setPrevVelocity)
             {
-                PrevVelocity = _r2D.velocity;
-                SetPrevVelocity = false;
+                _prevVelocity = _r2D.velocity;
+                _setPrevVelocity = false;
             }
- 
-            Vector3 deltaVel = _r2D.velocity - (Vector2) PrevVelocity;
 
-            PlayImpactSound(c.collider, deltaVel, c.GetContact(0).normal, c.GetContact(0).point);
-            SetSlideTargetVolumes(c.collider.gameObject,
-                c.relativeVelocity,
-                c.contacts[0].normal,
-                c.contacts[0].point,
-                false);
+            Vector3 deltaVel = _r2D.velocity - (Vector2) _prevVelocity;
 
-            PrevVelocity = _r2D.velocity;
+            if (_collisionEvents.PlayOnCollisionStay)
+                PlayImpactSound(c.collider, deltaVel, c.GetContact(0).normal, c.GetContact(0).point);
+
+            if (_collisionEvents.SlideOnCollisionStay)
+            {
+                SetSlideTargetVolumes(c.collider.gameObject,
+                    c.relativeVelocity,
+                    c.contacts[0].normal,
+                    c.contacts[0].point,
+                    false);
+            }
+
+            _prevVelocity = _r2D.velocity;
         }
 
-        void OnCollisionExit2D(Collision2D c)
+        public void OnCollisionExit2DInternal(Collision2D c)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 ||
+            if (SoundMaterial == null || !enabled ||
+                SoundMaterial.AudioSets.Count == 0 ||
                 _audioContainersMap == null)
                 return;
 
             SetSlideTargetVolumes(c.collider.gameObject, c.relativeVelocity, Vector3.up, transform.position, true);
 
-            SetPrevVelocity = true;
+            _setPrevVelocity = true;
         }
 
         #endregion
 
         #region 2D Trigger Messages
 
-        void OnTriggerEnter2D(Collider2D collider)
+        private void OnTriggerEnter2D(Collider2D collider)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0)
+            if (!_collisionEvents.PlayOnTriggerEnter || SoundMaterial == null || !enabled ||
+                SoundMaterial.AudioSets.Count == 0)
                 return;
 
             PlayImpactSound(collider, TotalKinematicVelocity, Vector3.zero, collider.transform.position);
         }
 
-        void OnTriggerStay2D(Collider2D collider)
+        public void OnTriggerStay2DInternal(Collider2D collider)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 ||
+            if (SoundMaterial == null || !enabled ||
+                SoundMaterial.AudioSets.Count == 0 ||
                 _audioContainersMap == null)
                 return;
 
-            SetSlideTargetVolumes(collider.gameObject, TotalKinematicVelocity, Vector3.zero, collider.transform.position, false);
+            SetSlideTargetVolumes(collider.gameObject,
+                TotalKinematicVelocity,
+                Vector3.zero,
+                collider.transform.position,
+                false);
         }
 
-        void OnTriggerExit2D(Collider2D c)
+        public void OnTriggerExit2DInternal(Collider2D c)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 ||
+            if (SoundMaterial == null || !enabled ||
+                SoundMaterial.AudioSets.Count == 0 ||
                 _audioContainersMap == null)
                 return;
 
@@ -85,7 +101,6 @@ namespace PhysSound
         }
 
         #endregion
-
 
 #endif
     }

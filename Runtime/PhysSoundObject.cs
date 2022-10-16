@@ -27,14 +27,32 @@ namespace PhysSound
         {
 #if PHYS_SOUND_3D
             _r = GetComponent<Rigidbody>();
+            if (_r)
+            {
+                ValidateComponent<PhysSoundObject3DTriggerExit>(_collisionEvents.SlideOnTriggerExit);
+                ValidateComponent<PhysSoundObject3DTriggerStay>(_collisionEvents.SlideOnTriggerStay);
+                ValidateComponent<PhysSoundObject3DCollisionExit>(_collisionEvents.SlideOnCollisionExit);
+                ValidateComponent<PhysSoundObject3DCollisionStay>(_collisionEvents.PlayOnCollisionStay ||
+                                                                  _collisionEvents.SlideOnCollisionStay);
+            }
+
 #endif
 #if PHYS_SOUND_2D
             _r2D = GetComponent<Rigidbody2D>();
-#endif
-            if (AutoCreateSources)
+            if (_r2D)
             {
-                BaseImpactVol = ImpactAudio.volume;
-                BaseImpactPitch = ImpactAudio.pitch;
+                ValidateComponent<PhysSoundObject2DTriggerExit>(_collisionEvents.SlideOnTriggerExit);
+                ValidateComponent<PhysSoundObject2DTriggerStay>(_collisionEvents.SlideOnTriggerStay);
+                ValidateComponent<PhysSoundObject2DCollisionExit>(_collisionEvents.SlideOnCollisionExit);
+                ValidateComponent<PhysSoundObject2DCollisionStay>(_collisionEvents.PlayOnCollisionStay ||
+                                                                  _collisionEvents.SlideOnCollisionStay);
+            }
+
+#endif
+            if (_autoCreateSources)
+            {
+                _baseImpactVol = _impactAudio.volume;
+                _baseImpactPitch = _impactAudio.pitch;
 
                 _audioContainersMap = new Dictionary<PhysSoundKey, PhysSoundAudioContainer>();
                 AudioContainers = new List<PhysSoundAudioContainer>();
@@ -45,22 +63,22 @@ namespace PhysSound
                         continue;
 
                     PhysSoundAudioContainer audCont = new PhysSoundAudioContainer(audSet.Key);
-                    audCont.SlideAudio = PhysSoundTempAudioPool.GetAudioSourceCopy(ImpactAudio, gameObject);
+                    audCont.SlideAudio = PhysSoundTempAudioPool.GetAudioSourceCopy(_impactAudio, gameObject);
 
                     audCont.Initialize(this);
                     _audioContainersMap.Add(audCont.Key, audCont);
                     AudioContainers.Add(audCont);
                 }
 
-                ImpactAudio.loop = false;
+                _impactAudio.loop = false;
             }
             else
             {
-                if (ImpactAudio)
+                if (_impactAudio)
                 {
-                    ImpactAudio.loop = false;
-                    BaseImpactVol = ImpactAudio.volume;
-                    BaseImpactPitch = ImpactAudio.pitch;
+                    _impactAudio.loop = false;
+                    _baseImpactVol = _impactAudio.volume;
+                    _baseImpactPitch = _impactAudio.pitch;
                 }
 
                 if (AudioContainers.Count > 0)
@@ -79,7 +97,7 @@ namespace PhysSound
                         }
 
                         if (PlayClipAtPoint)
-                            audCont.Initialize(this, ImpactAudio);
+                            audCont.Initialize(this, _impactAudio);
                         else
                             audCont.Initialize(this);
 
@@ -90,8 +108,8 @@ namespace PhysSound
 
             if (PlayClipAtPoint)
                 PhysSoundTempAudioPool.Create();
-            else if (ImpactAudio != null && !ImpactAudio.isActiveAndEnabled)
-                ImpactAudio = PhysSoundTempAudioPool.GetAudioSourceCopy(ImpactAudio, gameObject);
+            else if (_impactAudio != null && !_impactAudio.isActiveAndEnabled)
+                _impactAudio = PhysSoundTempAudioPool.GetAudioSourceCopy(_impactAudio, gameObject);
 
             _mainCamera = _mainCamera ? _mainCamera : GetCameraTransform();
             _maxStep = Mathf.Round(Random.Range(2f, 4f));
@@ -112,14 +130,14 @@ namespace PhysSound
             for (int i = 0; i < AudioContainers.Count; i++)
                 AudioContainers[i].UpdateVolume();
 
-            if (ImpactAudio && !ImpactAudio.isPlaying)
-                ImpactAudio.Stop();
+            if (_impactAudio && !_impactAudio.isPlaying)
+                _impactAudio.Stop();
 
-            KinematicVelocity = (transform.position - PrevPosition) / Time.deltaTime;
-            PrevPosition = transform.position;
+            _kinematicVelocity = (transform.position - _prevPosition) / Time.deltaTime;
+            _prevPosition = transform.position;
 
-            KinematicAngularVelocity = Quaternion.Angle(PrevRotation, transform.rotation) / Time.deltaTime / 45f;
-            PrevRotation = transform.rotation;
+            _kinematicAngularVelocity = Quaternion.Angle(_prevRotation, transform.rotation) / Time.deltaTime / 45f;
+            _prevRotation = transform.rotation;
 
             // if there is too much collision, then the minimum FPS will be " < X", because OnCollisionStay slows everything down
             _breakOnCollisionStay = 1 / Time.unscaledDeltaTime < 30 + _maxStep * 2;
@@ -129,7 +147,7 @@ namespace PhysSound
 
         private void DistanceCheck()
         {
-            AudioSource source = ImpactAudio;
+            AudioSource source = _impactAudio;
             if (!source)
             {
                 for (int i = 0; i < AudioContainers.Count; i++)
@@ -160,15 +178,15 @@ namespace PhysSound
                     AudioContainers[i].Enable();
                 }
 
-                ImpactAudio.enabled = true;
+                _impactAudio.enabled = true;
                 enabled = true;
             }
             else if (!enable && enabled == true)
             {
-                if (ImpactAudio)
+                if (_impactAudio)
                 {
-                    ImpactAudio.Stop();
-                    ImpactAudio.enabled = false;
+                    _impactAudio.Stop();
+                    _impactAudio.enabled = false;
                 }
 
                 for (int i = 0; i < AudioContainers.Count; i++)
@@ -243,7 +261,8 @@ namespace PhysSound
                 //If it doesnt we set volumes based on the fallback setting of our material
 
                 if (SoundMaterial.Fallback != null &&
-                    _audioContainersMap.TryGetValue(SoundMaterial.Fallback?.MaterialTypeKey, out PhysSoundAudioContainer aud))
+                    _audioContainersMap.TryGetValue(SoundMaterial.Fallback?.MaterialTypeKey,
+                        out PhysSoundAudioContainer aud))
                 {
                     aud.SetTargetVolumeAndPitch(gameObject, otherObject, relativeVelocity, normal, exit);
                 }
@@ -251,5 +270,16 @@ namespace PhysSound
         }
 
         #endregion
+
+        private void ValidateComponent<T>(bool needComponent) where T : Component
+        {
+            if (needComponent)
+            {
+                if (!GetComponent<T>())
+                {
+                    gameObject.AddComponent<T>();
+                }
+            }
+        }
     }
 }

@@ -1,12 +1,11 @@
 {
-  "name": "com.scruffy-rules.phys-sound",
-  "version": "1.1.1",
+  "name": "com.mitay-walle.phys-sound",
+  "version": "1.2.1",
   "displayName": "Phys Sound",
-  "description": "The PhysSound system adds the ability to bring your physics to life through the use of impact and sliding\nsounds. The system works with both 2D and 3D physics.\nThere are 3 parts of the system: PhysSound Material Types, PhysSound Materials, PhysSound Objects",
+  "description": "Originaly developed by crazymonkey, The PhysSound system adds the ability to bring your physics to life through the use of impact and sliding\nsounds. The system works with both 2D and 3D physics.\nThere are 3 parts of the system: PhysSound Material Types, PhysSound Materials, PhysSound Objects",
   "unity": "2018.4",
-  "documentationUrl": "https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/main/README.md",
-  "licensesUrl": "https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/LICENSE",
-    "licensesUrl": "https://github.com/mitay-walle/com.scruffy-rules.phys-sound/blob/master/LICENSE",
+  "documentationUrl": "https://github.com/mitay-walle/com.mitay-walle.phys-sound/blob/main/README.md",
+  "licensesUrl": "https://github.com/mitay-walle/com.mitay-walle.phys-sound/blob/master/LICENSE.md",
   "dependencies": { },
   "keywords": [
     "Audio",

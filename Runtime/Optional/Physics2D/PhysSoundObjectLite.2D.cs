@@ -15,7 +15,7 @@ namespace PhysSound
 
             PlayImpactSound(collision.collider, collision.relativeVelocity, collision.GetContact(0).normal, collision.GetContact(0).point);
 
-            SetPrevVelocity = true;
+            _setPrevVelocity = true;
         }
 
         #endregion

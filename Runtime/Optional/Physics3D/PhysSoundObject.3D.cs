@@ -6,6 +6,7 @@ namespace PhysSound
     public partial class PhysSoundObject
     {
 #if PHYS_SOUND_3D
+
         #region 3D Collision Messages
 
         protected Vector3 _contactNormal;
@@ -21,14 +22,15 @@ namespace PhysSound
             _contactPoint = collision.GetContact(0).point;
             _relativeVelocity = collision.relativeVelocity;
 
-            PlayImpactSound(collision.collider, _relativeVelocity, _contactNormal, _contactPoint);
+            if (_collisionEvents.PlayOnCollisionEnter)
+                PlayImpactSound(collision.collider, _relativeVelocity, _contactNormal, _contactPoint);
 
-            SetPrevVelocity = true;
+            _setPrevVelocity = true;
         }
 
-        void OnCollisionStay(Collision collision)
+        public void OnCollisionStayInternal(Collision collision)
         {
-            if (_alertNotInSoundZone)
+            if (!_collisionEvents.SlideOnCollisionStay && !_collisionEvents.PlayOnCollisionStay || _alertNotInSoundZone)
                 return;
 
             _count++;
@@ -42,13 +44,13 @@ namespace PhysSound
                 _audioContainersMap == null)
                 return;
 
-            if (SetPrevVelocity)
+            if (_setPrevVelocity)
             {
-                PrevVelocity = _r.velocity;
-                SetPrevVelocity = false;
+                _prevVelocity = _r.velocity;
+                _setPrevVelocity = false;
             }
 
-            Vector3 deltaVel = _r.velocity - PrevVelocity;
+            Vector3 deltaVel = _r.velocity - _prevVelocity;
 
             if (collision.contactCount > 0)
             {
@@ -58,20 +60,29 @@ namespace PhysSound
 
             _relativeVelocity = collision.relativeVelocity;
 
-            PlayImpactSound(collision.collider, deltaVel, _contactNormal, _contactPoint);
-            SetSlideTargetVolumes(collision.collider.gameObject, _relativeVelocity, _contactNormal, _contactPoint, false);
+            if (_collisionEvents.PlayOnCollisionStay)
+            {
+                PlayImpactSound(collision.collider, deltaVel, _contactNormal, _contactPoint);
+            }
 
-            PrevVelocity = _r.velocity;
+            SetSlideTargetVolumes(collision.collider.gameObject,
+                _relativeVelocity,
+                _contactNormal,
+                _contactPoint,
+                false);
+
+            _prevVelocity = _r.velocity;
         }
 
-        void OnCollisionExit(Collision c)
+        public void OnCollisionExitInternal(Collision c)
         {
-            if (_alertNotInSoundZone || SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 ||
+            if (_alertNotInSoundZone || SoundMaterial == null || !this.enabled ||
+                SoundMaterial.AudioSets.Count == 0 ||
                 _audioContainersMap == null)
                 return;
 
             SetSlideTargetVolumes(c.collider.gameObject, Vector3.zero, Vector3.zero, transform.position, true);
-            SetPrevVelocity = true;
+            _setPrevVelocity = true;
         }
 
         #endregion
@@ -80,28 +91,39 @@ namespace PhysSound
 
         void OnTriggerEnter(Collider collider)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 || !HitsTriggers)
+            if (!_collisionEvents.PlayOnTriggerEnter || SoundMaterial == null || !this.enabled ||
+                SoundMaterial.AudioSets.Count == 0)
                 return;
 
             PlayImpactSound(collider, TotalKinematicVelocity, Vector3.zero, collider.transform.position);
         }
 
-        void OnTriggerStay(Collider collider)
+        public void OnTriggerStayInternal(Collider collider)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 ||
-                _audioContainersMap == null || !HitsTriggers)
+            if (SoundMaterial == null || !this.enabled ||
+                SoundMaterial.AudioSets.Count == 0 ||
+                _audioContainersMap == null)
                 return;
 
-            SetSlideTargetVolumes(collider.gameObject, TotalKinematicVelocity, Vector3.zero, collider.transform.position, false);
+            SetSlideTargetVolumes(collider.gameObject,
+                TotalKinematicVelocity,
+                Vector3.zero,
+                collider.transform.position,
+                false);
         }
 
-        void OnTriggerExit(Collider collider)
+        public void OnTriggerExitInternal(Collider collider)
         {
-            if (SoundMaterial == null || !this.enabled || SoundMaterial.AudioSets.Count == 0 ||
-                _audioContainersMap == null || !HitsTriggers)
+            if (SoundMaterial == null || !this.enabled ||
+                SoundMaterial.AudioSets.Count == 0 ||
+                _audioContainersMap == null)
                 return;
 
-            SetSlideTargetVolumes(collider.gameObject, TotalKinematicVelocity, Vector3.zero, collider.transform.position, true);
+            SetSlideTargetVolumes(collider.gameObject,
+                TotalKinematicVelocity,
+                Vector3.zero,
+                collider.transform.position,
+                true);
         }
 
         #endregion
