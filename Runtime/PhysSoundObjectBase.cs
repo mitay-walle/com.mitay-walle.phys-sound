@@ -39,7 +39,8 @@ namespace PhysSound
         protected abstract void Initialize();
 
 #if PHYS_SOUND_3D
-        protected Rigidbody _r;
+        protected Rigidbody _rigidbody;
+        protected ArticulationBody _articulationBody;
         protected void PlayImpactSound(Collider other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {
             if (!_delay.IsReady() || SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 ||
@@ -61,7 +62,7 @@ namespace PhysSound
 #endif
 
 #if PHYS_SOUND_2D
-        protected Rigidbody2D _r2D;
+        protected Rigidbody2D _rigidbody2D;
         protected void PlayImpactSound(Collider2D other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {
             if (!_delay.IsReady() || SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 ||

@@ -26,8 +26,9 @@ namespace PhysSound
         override protected void Initialize()
         {
 #if PHYS_SOUND_3D
-            _r = GetComponent<Rigidbody>();
-            if (_r)
+            _rigidbody = GetComponent<Rigidbody>();
+            _articulationBody = GetComponent<ArticulationBody>();
+            if (_rigidbody || _articulationBody)
             {
                 ValidateComponent<PhysSoundObject3DTriggerExit>(_collisionEvents.SlideOnTriggerExit);
                 ValidateComponent<PhysSoundObject3DTriggerStay>(_collisionEvents.SlideOnTriggerStay);
@@ -38,8 +39,8 @@ namespace PhysSound
 
 #endif
 #if PHYS_SOUND_2D
-            _r2D = GetComponent<Rigidbody2D>();
-            if (_r2D)
+            _rigidbody2D = GetComponent<Rigidbody2D>();
+            if (_rigidbody2D)
             {
                 ValidateComponent<PhysSoundObject2DTriggerExit>(_collisionEvents.SlideOnTriggerExit);
                 ValidateComponent<PhysSoundObject2DTriggerStay>(_collisionEvents.SlideOnTriggerStay);

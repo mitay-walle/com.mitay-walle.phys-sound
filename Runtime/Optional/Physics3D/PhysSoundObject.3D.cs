@@ -44,13 +44,18 @@ namespace PhysSound
                 _audioContainersMap == null)
                 return;
 
+            Vector3 velocity = default;
+
+            if (_rigidbody) velocity = _rigidbody.velocity;
+            if (_articulationBody) velocity = _articulationBody.velocity;
+            
             if (_setPrevVelocity)
             {
-                _prevVelocity = _r.velocity;
+                _prevVelocity = velocity;
                 _setPrevVelocity = false;
             }
 
-            Vector3 deltaVel = _r.velocity - _prevVelocity;
+            Vector3 deltaVel = velocity - _prevVelocity;
 
             if (collision.contactCount > 0)
             {
@@ -71,7 +76,7 @@ namespace PhysSound
                 _contactPoint,
                 false);
 
-            _prevVelocity = _r.velocity;
+            _prevVelocity = velocity;
         }
 
         public void OnCollisionExitInternal(Collision c)

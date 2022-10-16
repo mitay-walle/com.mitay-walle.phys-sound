@@ -26,10 +26,10 @@ namespace PhysSound
         override protected void Initialize()
         {
 #if PHYS_SOUND_3D
-            _r = GetComponent<Rigidbody>();
+            _rigidbody = GetComponent<Rigidbody>();
 #endif
 #if PHYS_SOUND_2D
-            _r2D = GetComponent<Rigidbody2D>();
+            _rigidbody2D = GetComponent<Rigidbody2D>();
 #endif
 
             if (_autoCreateSources)

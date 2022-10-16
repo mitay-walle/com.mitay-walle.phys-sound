@@ -30,11 +30,11 @@ namespace PhysSound
 
             if (_setPrevVelocity)
             {
-                _prevVelocity = _r2D.velocity;
+                _prevVelocity = _rigidbody2D.velocity;
                 _setPrevVelocity = false;
             }
 
-            Vector3 deltaVel = _r2D.velocity - (Vector2) _prevVelocity;
+            Vector3 deltaVel = _rigidbody2D.velocity - (Vector2) _prevVelocity;
 
             if (_collisionEvents.PlayOnCollisionStay)
                 PlayImpactSound(c.collider, deltaVel, c.GetContact(0).normal, c.GetContact(0).point);
@@ -48,7 +48,7 @@ namespace PhysSound
                     false);
             }
 
-            _prevVelocity = _r2D.velocity;
+            _prevVelocity = _rigidbody2D.velocity;
         }
 
         public void OnCollisionExit2DInternal(Collision2D c)
