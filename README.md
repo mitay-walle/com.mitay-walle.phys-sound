@@ -12,7 +12,7 @@ Install [by Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 - 2D Trigger sample
 - surface type is recognized by PhysicMaterial
 - disabling Physics2D, Physics, Terrain strip code through custom scripting define Symbols
-- ArticluationBody support
+- ArticluationBody support, samples
 - delay for impact sound
 ## Changed
 - Converted to UPM package
