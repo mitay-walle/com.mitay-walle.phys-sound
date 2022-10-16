@@ -18,6 +18,7 @@ MonoBehaviour:
   TimeScalePitch: 0
   ScaleImpactVolume: 0
   SlidePitchMod: 0.05
+  Delay: 0.05
   VolumeCurve:
     serializedVersion: 2
     m_Curve:

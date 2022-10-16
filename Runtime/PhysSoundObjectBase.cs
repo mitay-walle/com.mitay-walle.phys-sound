@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using PhysSound.Utilities;
+using UnityEngine;
 
 namespace PhysSound
 {
@@ -19,6 +20,7 @@ namespace PhysSound
         protected Vector3 _prevPosition;
         protected Vector3 _kinematicVelocity;
         protected Quaternion _prevRotation;
+        private TimeTrigger _delay;
 
         protected Vector3 TotalKinematicVelocity => _kinematicVelocity + (Vector3.one * _kinematicAngularVelocity);
 
@@ -40,13 +42,15 @@ namespace PhysSound
         protected Rigidbody _r;
         protected void PlayImpactSound(Collider other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {
-            if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 ||
+            if (!_delay.IsReady() || SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 ||
                 Time.frameCount == _lastFrame)
             {
                 return;
             }
 
             if (!_impactAudio) return;
+
+            _delay.Restart(SoundMaterial.Delay);
 
             AudioClip clip = SoundMaterial.GetImpactAudio(other, relativeVelocity, normal, contactPoint);
             if (clip)
@@ -60,13 +64,15 @@ namespace PhysSound
         protected Rigidbody2D _r2D;
         protected void PlayImpactSound(Collider2D other, Vector3 relativeVelocity, Vector3 normal, Vector3 contactPoint)
         {
-            if (SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 ||
+            if (!_delay.IsReady() || SoundMaterial == null || !enabled || SoundMaterial.AudioSets.Count == 0 ||
                 Time.frameCount == _lastFrame)
             {
                 return;
             }
 
             if (!_impactAudio) return;
+
+            _delay.Restart(SoundMaterial.Delay);
 
             AudioClip clip = SoundMaterial.GetImpactAudio(other, relativeVelocity, normal, contactPoint);
             if (clip)

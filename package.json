@@ -1,6 +1,6 @@
 {
   "name": "com.mitay-walle.phys-sound",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "displayName": "Phys Sound",
   "description": "Originaly developed by crazymonkey, The PhysSound system adds the ability to bring your physics to life through the use of impact and sliding\nsounds. The system works with both 2D and 3D physics.\nThere are 3 parts of the system: PhysSound Material Types, PhysSound Materials, PhysSound Objects",
   "unity": "2018.4",

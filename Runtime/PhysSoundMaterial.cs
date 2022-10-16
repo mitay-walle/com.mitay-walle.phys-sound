@@ -14,6 +14,7 @@ namespace PhysSound
         public bool TimeScalePitch;
         public bool ScaleImpactVolume = true;
         public float SlidePitchMod = 0.05f;
+        public float Delay = 0.05f;
 
         [SerializeField] protected AnimationCurve VolumeCurve = AnimationCurve.Linear(0, 0, 1, 1);
         [SerializeField] protected LayerMask CollisionMask = -1;
@@ -26,6 +27,7 @@ namespace PhysSound
 
         public List<PhysSoundAudioSet> AudioSets = new List<PhysSoundAudioSet>();
         private Dictionary<PhysSoundKey, PhysSoundAudioSet> _audioSetDic;
+
 
         public void Init()
         {
