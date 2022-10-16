@@ -7,16 +7,23 @@ sounds. The system works with both 2D and 3D physics.
 
 Install [by Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 
-Optional modules dependent to unity built-in modules:
-- Terrain
-- 2D Collision events
-- 3D Collision events
-
-## Overview ##
-- Recursive Fallback Materials
-- 2D Samples scene
+## Added
+- 2D Samples Scene
 - 2D Trigger sample
-- 3D Samples scene
+- surface type is recognized by PhysicMaterial
+- disabling Physics2D, Physics, Terrain strip code through custom scripting define Symbols
+- ArticluationBody support
+- delay for impact sound
+## Changed
+- Converted to UPM package
+- Demo converted to UPM package Samples
+- Custom Inspectors removed
+- codegen PhysMaterialType (int + string) replaced with PhysSoundKey (ScriptableObject)
+- Fallback now PhysSoundMaterial, and became recursive
+- collision events placed to separated components
+## Fixed
+- optimization distance check -> sqr distance check
+- Update() replaced with FixedUpdate() to fix KinematicVelocity became 0,0,0
 
 There are 4 parts of the system: 
 - PhysSoundDatabase : ScriptableObject
