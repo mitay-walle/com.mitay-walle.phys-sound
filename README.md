@@ -14,6 +14,7 @@ Install [by Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
 - disabling Physics2D, Physics, Terrain Unity modules strip code through custom scripting define Symbols
 - [ArticluationBody](https://docs.unity3d.com/Manual/class-ArticulationBody.html) support, samples
 - delay for impact sound
+- Icons for easy recognition and workflow
 ## Changed
 - Converted to UPM package
 - Demo converted to UPM package Samples
