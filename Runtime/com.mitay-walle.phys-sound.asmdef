@@ -14,6 +14,11 @@
     "defineConstraints": [],
     "versionDefines": [
         {
+            "name": "com.unity.modules.audio",
+            "expression": "0",
+            "define": "PHYS_SOUND_AUDIO"
+        },
+        {
             "name": "com.unity.modules.physics",
             "expression": "0",
             "define": "PHYS_SOUND_3D"
