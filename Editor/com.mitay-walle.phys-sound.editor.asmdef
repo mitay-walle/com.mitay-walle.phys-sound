@@ -1,0 +1,29 @@
+{
+  "name": "com.mitay-walle.phys-sound.editor",
+  "rootNamespace": "PhysSound.Editor",
+  "references": [
+    "com.mitay-walle.phys-sound"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.unity.modules.audio",
+      "expression": "0",
+      "define": "PHYS_SOUND_AUDIO"
+    },
+    {
+      "name": "com.unity.modules.physics",
+      "expression": "0",
+      "define": "PHYS_SOUND_3D"
+    }
+  ],
+  "noEngineReferences": false
+}
