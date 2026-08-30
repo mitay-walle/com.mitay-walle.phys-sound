@@ -6,176 +6,298 @@ using UnityEngine.Audio;
 
 namespace PhysSound
 {
-    public enum PhysSoundContactBackend
-    {
-        ProvidesContacts,
-        Components
-    }
-
-    [Serializable]
-    public sealed class PhysSoundSurface
-    {
-        [SerializeField] private string _name = "Surface";
-        [SerializeField] private PhysicsMaterial[] _materials = Array.Empty<PhysicsMaterial>();
-
-        internal string Name => string.IsNullOrWhiteSpace(_name) ? PhysSoundSettings.DefaultSurface : _name.Trim();
-        internal PhysicsMaterial[] Materials => _materials;
-    }
-
-    [Serializable]
-    public sealed class PhysSoundInteraction
-    {
-        [SerializeField] private string _surfaceA = PhysSoundSettings.DefaultSurface;
-        [SerializeField] private string _surfaceB = PhysSoundSettings.AnySurface;
-
-        [Header("Impact")]
-        [SerializeField] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
-        [SerializeField] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-        [SerializeField, Min(0f)] private float _minimumImpactImpulse = 0.1f;
-        [SerializeField, Min(0f)] private float _maximumImpactImpulse = 10f;
-        [SerializeField, Min(0f)] private float _impactVolumeMultiplier = 1f;
-        [SerializeField] private Vector2 _impactPitchRange = new Vector2(0.95f, 1.05f);
-
-        [Header("Slide")]
-        [SerializeField] private AudioClip[] _slideClips = Array.Empty<AudioClip>();
-        [SerializeField] private AnimationCurve _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-        [SerializeField, Min(0f)] private float _minimumSlideSpeed = 0.05f;
-        [SerializeField, Min(0f)] private float _maximumSlideSpeed = 5f;
-        [SerializeField, Min(0f)] private float _slideVolumeMultiplier = 1f;
-        [SerializeField] private Vector2 _slidePitchRange = new Vector2(0.9f, 1.2f);
-
-        internal string SurfaceA => _surfaceA;
-        internal string SurfaceB => _surfaceB;
-        internal bool HasSlide => HasValidClip(_slideClips);
-
-        internal AudioClip GetImpactClip()
-        {
-            return GetRandomClip(_impactClips);
-        }
-
-        internal AudioClip GetSlideClip()
-        {
-            return GetRandomClip(_slideClips);
-        }
-
-        internal float EvaluateImpactVolume(float impulse)
-        {
-            if (impulse < _minimumImpactImpulse)
-            {
-                return 0f;
-            }
-
-            float normalized = _maximumImpactImpulse <= _minimumImpactImpulse
-                ? 1f
-                : Mathf.InverseLerp(_minimumImpactImpulse, _maximumImpactImpulse, impulse);
-
-            float value = _impactVolume == null ? normalized : _impactVolume.Evaluate(normalized);
-            return Mathf.Max(0f, value) * _impactVolumeMultiplier;
-        }
-
-        internal float GetImpactPitch()
-        {
-            float min = Mathf.Min(_impactPitchRange.x, _impactPitchRange.y);
-            float max = Mathf.Max(_impactPitchRange.x, _impactPitchRange.y);
-            return UnityEngine.Random.Range(min, max);
-        }
-
-        internal float EvaluateSlideVolume(float speed)
-        {
-            if (speed < _minimumSlideSpeed)
-            {
-                return 0f;
-            }
-
-            float normalized = _maximumSlideSpeed <= _minimumSlideSpeed
-                ? 1f
-                : Mathf.InverseLerp(_minimumSlideSpeed, _maximumSlideSpeed, speed);
-
-            float value = _slideVolume == null ? normalized : _slideVolume.Evaluate(normalized);
-            return Mathf.Max(0f, value) * _slideVolumeMultiplier;
-        }
-
-        internal float EvaluateSlidePitch(float speed)
-        {
-            float normalized = _maximumSlideSpeed <= _minimumSlideSpeed
-                ? 1f
-                : Mathf.InverseLerp(_minimumSlideSpeed, _maximumSlideSpeed, speed);
-
-            return Mathf.Lerp(_slidePitchRange.x, _slidePitchRange.y, normalized);
-        }
-
-        private static bool HasValidClip(AudioClip[] clips)
-        {
-            if (clips == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < clips.Length; i++)
-            {
-                if (clips[i] != null)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static AudioClip GetRandomClip(AudioClip[] clips)
-        {
-            if (clips == null || clips.Length == 0)
-            {
-                return null;
-            }
-
-            int validCount = 0;
-
-            for (int i = 0; i < clips.Length; i++)
-            {
-                if (clips[i] != null)
-                {
-                    validCount++;
-                }
-            }
-
-            if (validCount == 0)
-            {
-                return null;
-            }
-
-            int selected = UnityEngine.Random.Range(0, validCount);
-
-            for (int i = 0; i < clips.Length; i++)
-            {
-                AudioClip clip = clips[i];
-
-                if (clip == null)
-                {
-                    continue;
-                }
-
-                if (selected == 0)
-                {
-                    return clip;
-                }
-
-                selected--;
-            }
-
-            return null;
-        }
-    }
-
     public sealed class PhysSoundSettings : ScriptableObject
     {
         public const string DefaultSurface = "Default";
         public const string AnySurface = "*";
         public const string ResourcePath = "PhysSound/PhysSoundSettings";
 
-        [SerializeField] private PhysSoundContactBackend _contactBackend = PhysSoundContactBackend.ProvidesContacts;
-        [SerializeField] private List<PhysSoundSurface> _surfaces = new List<PhysSoundSurface>();
-        [SerializeField] private List<PhysSoundInteraction> _interactions = new List<PhysSoundInteraction>();
+        internal enum ContactBackend
+        {
+            ProvidesContacts,
+            Components
+        }
+
+        [Serializable]
+        internal struct Surface
+        {
+            [SerializeField] private string _name;
+            [SerializeField] private PhysicsMaterial[] _materials;
+
+            internal string Name => NormalizeSurfaceName(_name);
+            internal PhysicsMaterial[] Materials => _materials;
+            internal bool IsUninitialized => string.IsNullOrEmpty(_name) && _materials == null;
+
+            internal static Surface CreateDefault()
+            {
+                return new Surface
+                {
+                    _name = DefaultSurface,
+                    _materials = Array.Empty<PhysicsMaterial>()
+                };
+            }
+
+            internal void EnsureDefaults()
+            {
+                if (_materials == null)
+                {
+                    _materials = Array.Empty<PhysicsMaterial>();
+                }
+            }
+        }
+
+        [Serializable]
+        internal struct Interaction
+        {
+            [SerializeField] private string _surfaceA;
+            [SerializeField] private string _surfaceB;
+
+            [Header("Impact")]
+            [SerializeField] private AudioClip[] _impactClips;
+            [SerializeField] private AnimationCurve _impactVolume;
+            [SerializeField, Min(0f)] private float _minimumImpactImpulse;
+            [SerializeField, Min(0f)] private float _maximumImpactImpulse;
+            [SerializeField, Min(0f)] private float _impactVolumeMultiplier;
+            [SerializeField] private Vector2 _impactPitchRange;
+
+            [Header("Slide")]
+            [SerializeField] private AudioClip[] _slideClips;
+            [SerializeField] private AnimationCurve _slideVolume;
+            [SerializeField, Min(0f)] private float _minimumSlideSpeed;
+            [SerializeField, Min(0f)] private float _maximumSlideSpeed;
+            [SerializeField, Min(0f)] private float _slideVolumeMultiplier;
+            [SerializeField] private Vector2 _slidePitchRange;
+
+            internal string SurfaceA => NormalizeSurfaceName(_surfaceA);
+            internal string SurfaceB => string.IsNullOrWhiteSpace(_surfaceB) ? AnySurface : _surfaceB.Trim();
+            internal bool HasSlide => HasValidClip(_slideClips);
+
+            internal bool IsUninitialized =>
+                string.IsNullOrEmpty(_surfaceA) &&
+                string.IsNullOrEmpty(_surfaceB) &&
+                _impactClips == null &&
+                _impactVolume == null &&
+                _minimumImpactImpulse == 0f &&
+                _maximumImpactImpulse == 0f &&
+                _impactVolumeMultiplier == 0f &&
+                _impactPitchRange == Vector2.zero &&
+                _slideClips == null &&
+                _slideVolume == null &&
+                _minimumSlideSpeed == 0f &&
+                _maximumSlideSpeed == 0f &&
+                _slideVolumeMultiplier == 0f &&
+                _slidePitchRange == Vector2.zero;
+
+            internal static Interaction CreateDefault()
+            {
+                return new Interaction
+                {
+                    _surfaceA = DefaultSurface,
+                    _surfaceB = AnySurface,
+                    _impactClips = Array.Empty<AudioClip>(),
+                    _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f),
+                    _minimumImpactImpulse = 0.1f,
+                    _maximumImpactImpulse = 10f,
+                    _impactVolumeMultiplier = 1f,
+                    _impactPitchRange = new Vector2(0.95f, 1.05f),
+                    _slideClips = Array.Empty<AudioClip>(),
+                    _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f),
+                    _minimumSlideSpeed = 0.05f,
+                    _maximumSlideSpeed = 5f,
+                    _slideVolumeMultiplier = 1f,
+                    _slidePitchRange = new Vector2(0.9f, 1.2f)
+                };
+            }
+
+            internal void EnsureDefaults()
+            {
+                if (_impactClips == null)
+                {
+                    _impactClips = Array.Empty<AudioClip>();
+                }
+
+                if (_slideClips == null)
+                {
+                    _slideClips = Array.Empty<AudioClip>();
+                }
+
+                if (_impactVolume == null)
+                {
+                    _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+                }
+
+                if (_slideVolume == null)
+                {
+                    _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+                }
+            }
+
+            internal AudioClip GetImpactClip()
+            {
+                return GetRandomClip(_impactClips);
+            }
+
+            internal AudioClip GetSlideClip()
+            {
+                return GetRandomClip(_slideClips);
+            }
+
+            internal float EvaluateImpactVolume(float impulse)
+            {
+                if (impulse < _minimumImpactImpulse)
+                {
+                    return 0f;
+                }
+
+                float normalized = _maximumImpactImpulse <= _minimumImpactImpulse
+                    ? 1f
+                    : Mathf.InverseLerp(_minimumImpactImpulse, _maximumImpactImpulse, impulse);
+
+                float value = _impactVolume == null ? normalized : _impactVolume.Evaluate(normalized);
+                return Mathf.Max(0f, value) * _impactVolumeMultiplier;
+            }
+
+            internal float GetImpactPitch()
+            {
+                float min = Mathf.Min(_impactPitchRange.x, _impactPitchRange.y);
+                float max = Mathf.Max(_impactPitchRange.x, _impactPitchRange.y);
+                return UnityEngine.Random.Range(min, max);
+            }
+
+            internal float EvaluateSlideVolume(float speed)
+            {
+                if (speed < _minimumSlideSpeed)
+                {
+                    return 0f;
+                }
+
+                float normalized = _maximumSlideSpeed <= _minimumSlideSpeed
+                    ? 1f
+                    : Mathf.InverseLerp(_minimumSlideSpeed, _maximumSlideSpeed, speed);
+
+                float value = _slideVolume == null ? normalized : _slideVolume.Evaluate(normalized);
+                return Mathf.Max(0f, value) * _slideVolumeMultiplier;
+            }
+
+            internal float EvaluateSlidePitch(float speed)
+            {
+                float normalized = _maximumSlideSpeed <= _minimumSlideSpeed
+                    ? 1f
+                    : Mathf.InverseLerp(_minimumSlideSpeed, _maximumSlideSpeed, speed);
+
+                return Mathf.Lerp(_slidePitchRange.x, _slidePitchRange.y, normalized);
+            }
+
+            private static bool HasValidClip(AudioClip[] clips)
+            {
+                if (clips == null)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < clips.Length; i++)
+                {
+                    if (clips[i] != null)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            private static AudioClip GetRandomClip(AudioClip[] clips)
+            {
+                if (clips == null || clips.Length == 0)
+                {
+                    return null;
+                }
+
+                int validCount = 0;
+
+                for (int i = 0; i < clips.Length; i++)
+                {
+                    if (clips[i] != null)
+                    {
+                        validCount++;
+                    }
+                }
+
+                if (validCount == 0)
+                {
+                    return null;
+                }
+
+                int selected = UnityEngine.Random.Range(0, validCount);
+
+                for (int i = 0; i < clips.Length; i++)
+                {
+                    AudioClip clip = clips[i];
+
+                    if (clip == null)
+                    {
+                        continue;
+                    }
+
+                    if (selected == 0)
+                    {
+                        return clip;
+                    }
+
+                    selected--;
+                }
+
+                return null;
+            }
+        }
+
+        internal readonly struct InteractionKey : IEquatable<InteractionKey>
+        {
+            private readonly string _first;
+            private readonly string _second;
+
+            internal InteractionKey(string first, string second)
+            {
+                first = NormalizeSurfaceName(first);
+                second = NormalizeSurfaceName(second);
+
+                if (string.Compare(first, second, StringComparison.OrdinalIgnoreCase) <= 0)
+                {
+                    _first = first;
+                    _second = second;
+                }
+                else
+                {
+                    _first = second;
+                    _second = first;
+                }
+            }
+
+            public bool Equals(InteractionKey other)
+            {
+                return string.Equals(_first, other._first, StringComparison.OrdinalIgnoreCase) &&
+                       string.Equals(_second, other._second, StringComparison.OrdinalIgnoreCase);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is InteractionKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    int firstHash = StringComparer.OrdinalIgnoreCase.GetHashCode(_first ?? string.Empty);
+                    int secondHash = StringComparer.OrdinalIgnoreCase.GetHashCode(_second ?? string.Empty);
+                    return (firstHash * 397) ^ secondHash;
+                }
+            }
+        }
+
+        [SerializeField] private ContactBackend _contactBackend = ContactBackend.ProvidesContacts;
+        [SerializeField] private List<Surface> _surfaces = new List<Surface> { Surface.CreateDefault() };
+        [SerializeField] private List<Interaction> _interactions = new List<Interaction> { Interaction.CreateDefault() };
 
         [Header("Voice Pool")]
         [SerializeField, Min(1)] private int _maximumVoices = 32;
@@ -197,7 +319,7 @@ namespace PhysSound
         [SerializeField, Range(0, 256)] private int _priority = 128;
         [SerializeField, Range(0f, 1.1f)] private float _reverbZoneMix = 1f;
 
-        internal PhysSoundContactBackend ContactBackend => _contactBackend;
+        internal ContactBackend Backend => _contactBackend;
         internal int MaximumVoices => Mathf.Max(1, _maximumVoices);
         internal float MinimumImpactInterval => Mathf.Max(0f, _minimumImpactInterval);
         internal float SlideContactTimeout => Mathf.Max(0f, _slideContactTimeout);
@@ -220,9 +342,14 @@ namespace PhysSound
             return Resources.Load<PhysSoundSettings>(ResourcePath);
         }
 
+        internal Interaction GetInteraction(int index)
+        {
+            return _interactions[index];
+        }
+
         internal void BuildLookups(
             Dictionary<PhysicsMaterial, string> surfaces,
-            Dictionary<PhysSoundInteractionKey, PhysSoundInteraction> interactions)
+            Dictionary<InteractionKey, int> interactions)
         {
             surfaces.Clear();
             interactions.Clear();
@@ -231,18 +358,19 @@ namespace PhysSound
             {
                 for (int i = 0; i < _surfaces.Count; i++)
                 {
-                    PhysSoundSurface surface = _surfaces[i];
+                    Surface surface = _surfaces[i];
+                    PhysicsMaterial[] materials = surface.Materials;
 
-                    if (surface == null || surface.Materials == null)
+                    if (materials == null)
                     {
                         continue;
                     }
 
-                    string surfaceName = NormalizeSurfaceName(surface.Name);
+                    string surfaceName = surface.Name;
 
-                    for (int j = 0; j < surface.Materials.Length; j++)
+                    for (int j = 0; j < materials.Length; j++)
                     {
-                        PhysicsMaterial material = surface.Materials[j];
+                        PhysicsMaterial material = materials[j];
 
                         if (material != null)
                         {
@@ -259,14 +387,8 @@ namespace PhysSound
 
             for (int i = 0; i < _interactions.Count; i++)
             {
-                PhysSoundInteraction interaction = _interactions[i];
-
-                if (interaction == null)
-                {
-                    continue;
-                }
-
-                interactions[new PhysSoundInteractionKey(interaction.SurfaceA, interaction.SurfaceB)] = interaction;
+                Interaction interaction = _interactions[i];
+                interactions[new InteractionKey(interaction.SurfaceA, interaction.SurfaceB)] = i;
             }
         }
 
@@ -281,49 +403,31 @@ namespace PhysSound
             _minimumDistance = Mathf.Max(0f, _minimumDistance);
             _maximumDistance = Mathf.Max(_minimumDistance, _maximumDistance);
             _priority = Mathf.Clamp(_priority, 0, 256);
-        }
-    }
 
-    internal readonly struct PhysSoundInteractionKey : IEquatable<PhysSoundInteractionKey>
-    {
-        private readonly string _first;
-        private readonly string _second;
-
-        internal PhysSoundInteractionKey(string first, string second)
-        {
-            first = PhysSoundSettings.NormalizeSurfaceName(first);
-            second = PhysSoundSettings.NormalizeSurfaceName(second);
-
-            if (string.Compare(first, second, StringComparison.OrdinalIgnoreCase) <= 0)
+            if (_surfaces == null)
             {
-                _first = first;
-                _second = second;
+                _surfaces = new List<Surface>();
             }
-            else
+
+            for (int i = 0; i < _surfaces.Count; i++)
             {
-                _first = second;
-                _second = first;
+                Surface surface = _surfaces[i];
+                surface = surface.IsUninitialized ? Surface.CreateDefault() : surface;
+                surface.EnsureDefaults();
+                _surfaces[i] = surface;
             }
-        }
 
-        public bool Equals(PhysSoundInteractionKey other)
-        {
-            return string.Equals(_first, other._first, StringComparison.OrdinalIgnoreCase) &&
-                   string.Equals(_second, other._second, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is PhysSoundInteractionKey other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
+            if (_interactions == null)
             {
-                int firstHash = StringComparer.OrdinalIgnoreCase.GetHashCode(_first ?? string.Empty);
-                int secondHash = StringComparer.OrdinalIgnoreCase.GetHashCode(_second ?? string.Empty);
-                return (firstHash * 397) ^ secondHash;
+                _interactions = new List<Interaction>();
+            }
+
+            for (int i = 0; i < _interactions.Count; i++)
+            {
+                Interaction interaction = _interactions[i];
+                interaction = interaction.IsUninitialized ? Interaction.CreateDefault() : interaction;
+                interaction.EnsureDefaults();
+                _interactions[i] = interaction;
             }
         }
     }
