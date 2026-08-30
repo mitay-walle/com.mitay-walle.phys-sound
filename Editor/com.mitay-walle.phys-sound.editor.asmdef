@@ -1,8 +1,12 @@
 {
-  "name": "com.mitay-walle.phys-sound",
-  "rootNamespace": "PhysSound",
-  "references": [],
-  "includePlatforms": [],
+  "name": "com.mitay-walle.phys-sound.editor",
+  "rootNamespace": "PhysSound.Editor",
+  "references": [
+    "com.mitay-walle.phys-sound"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,
@@ -19,16 +23,6 @@
       "name": "com.unity.modules.physics",
       "expression": "0",
       "define": "PHYS_SOUND_3D"
-    },
-    {
-      "name": "com.unity.modules.physics2d",
-      "expression": "0",
-      "define": "PHYS_SOUND_2D"
-    },
-    {
-      "name": "com.unity.modules.terrain",
-      "expression": "0",
-      "define": "PHYS_SOUND_TERRAIN"
     }
   ],
   "noEngineReferences": false
