@@ -324,6 +324,11 @@ namespace PhysSound.Editor
             SerializedProperty materials = string.IsNullOrEmpty(propertyPath)
                 ? null
                 : serializedOwner.FindProperty($"{propertyPath}.value._materials");
+#if PHYS_SOUND_TERRAIN
+            SerializedProperty terrainLayers = string.IsNullOrEmpty(propertyPath)
+                ? null
+                : serializedOwner.FindProperty($"{propertyPath}.value._terrainLayers");
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
             SerializedProperty materials2D = string.IsNullOrEmpty(propertyPath)
                 ? null
@@ -344,6 +349,15 @@ namespace PhysSound.Editor
             materialsField.Bind(serializedOwner);
             materialsField.TrackPropertyValue(materials, _ => InvalidateValidation());
             materialScroll.Add(materialsField);
+#if PHYS_SOUND_TERRAIN
+            if (terrainLayers != null)
+            {
+                PropertyField terrainLayersField = new(terrainLayers, "Terrain Layers");
+                terrainLayersField.Bind(serializedOwner);
+                terrainLayersField.TrackPropertyValue(terrainLayers, _ => InvalidateValidation());
+                materialScroll.Add(terrainLayersField);
+            }
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
             if (materials2D != null)
             {
@@ -744,6 +758,11 @@ namespace PhysSound.Editor
             SerializedProperty materials = string.IsNullOrEmpty(propertyPath)
                 ? null
                 : serializedOwner.FindProperty($"{propertyPath}.value._materials");
+#if PHYS_SOUND_TERRAIN
+            SerializedProperty terrainLayers = string.IsNullOrEmpty(propertyPath)
+                ? null
+                : serializedOwner.FindProperty($"{propertyPath}.value._terrainLayers");
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
             SerializedProperty materials2D = string.IsNullOrEmpty(propertyPath)
                 ? null
@@ -756,6 +775,12 @@ namespace PhysSound.Editor
             }
 
             float contentHeight = EditorGUI.GetPropertyHeight(materials, true);
+#if PHYS_SOUND_TERRAIN
+            if (terrainLayers != null)
+            {
+                contentHeight += Spacing + EditorGUI.GetPropertyHeight(terrainLayers, true);
+            }
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
             if (materials2D != null)
             {
@@ -766,12 +791,29 @@ namespace PhysSound.Editor
             _surfaceScroll = GUI.BeginScrollView(rect, _surfaceScroll, view);
             Rect materialsRect = new(view.x, view.y, view.width, EditorGUI.GetPropertyHeight(materials, true));
             EditorGUI.PropertyField(materialsRect, materials, new GUIContent("Physics Materials"), true);
+#if PHYS_SOUND_TERRAIN
+            Rect previousRect = materialsRect;
+            if (terrainLayers != null)
+            {
+                Rect terrainLayersRect = new(
+                    view.x,
+                    materialsRect.yMax + Spacing,
+                    view.width,
+                    EditorGUI.GetPropertyHeight(terrainLayers, true));
+                EditorGUI.PropertyField(terrainLayersRect, terrainLayers, new GUIContent("Terrain Layers"), true);
+                previousRect = terrainLayersRect;
+            }
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
             if (materials2D != null)
             {
                 Rect materials2DRect = new(
                     view.x,
+#if PHYS_SOUND_TERRAIN
+                    previousRect.yMax + Spacing,
+#else
                     materialsRect.yMax + Spacing,
+#endif
                     view.width,
                     EditorGUI.GetPropertyHeight(materials2D, true));
                 EditorGUI.PropertyField(materials2DRect, materials2D, new GUIContent("Physics Materials 2D"), true);
@@ -1291,7 +1333,7 @@ namespace PhysSound.Editor
                 GetValidationError(owner, PreviewMode.SlideAudio));
             _tabContents[(int)PreviewMode.Curves] = CreateTabContent(
                 "Curves",
-                "Edit the two-point volume and pitch response curves for impact and sliding audio.",
+                "Edit the two-point volume and pitch response curves for impact, sliding, and rolling audio.",
                 GetValidationError(owner, PreviewMode.Curves));
         }
 
@@ -1489,7 +1531,7 @@ namespace PhysSound.Editor
             }
 
             SerializedObject serializedOwner = new(owner);
-            string[] names = { "_impactVolume", "_impactPitch", "_slideVolume", "_slidePitch" };
+            string[] names = { "_impactVolume", "_impactPitch", "_slideVolume", "_slidePitch", "_rollVolume", "_rollPitch" };
             for (int i = 0; i < names.Length; i++)
             {
                 SerializedProperty property = serializedOwner.FindProperty($"{entry.PropertyPath}.{names[i]}");
@@ -1522,6 +1564,9 @@ namespace PhysSound.Editor
 
             HashSet<string> normalizedNames = new(StringComparer.OrdinalIgnoreCase);
             HashSet<PhysicsMaterial> materials = new();
+#if PHYS_SOUND_TERRAIN
+            HashSet<TerrainLayer> terrainLayers = new();
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
             HashSet<PhysicsMaterial2D> materials2D = new();
 #endif
@@ -1564,6 +1609,24 @@ namespace PhysSound.Editor
                     }
                 }
 
+#if PHYS_SOUND_TERRAIN
+                TerrainLayer[] surfaceTerrainLayers = surface.TerrainLayers;
+                for (int i = 0; surfaceTerrainLayers != null && i < surfaceTerrainLayers.Length; i++)
+                {
+                    TerrainLayer layer = surfaceTerrainLayers[i];
+                    if (layer == null)
+                    {
+                        return $"Surface \"{name}\" has an unassigned Terrain Layer slot.";
+                    }
+
+                    hasMaterial = true;
+                    if (!terrainLayers.Add(layer))
+                    {
+                        return $"Terrain Layer \"{layer.name}\" is assigned to more than one surface.";
+                    }
+                }
+#endif
+
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
                 PhysicsMaterial2D[] surfaceMaterials2D = surface.Materials2D;
                 for (int i = 0; surfaceMaterials2D != null && i < surfaceMaterials2D.Length; i++)
@@ -1584,7 +1647,7 @@ namespace PhysSound.Editor
 
                 if (!hasMaterial)
                 {
-                    return $"Surface \"{name}\" has no Physics Materials.";
+					return $"Surface \"{name}\" has no material assignments.";
                 }
             }
 
@@ -2238,11 +2301,16 @@ namespace PhysSound.Editor
             }
 
             Rect modeRect = TakeTop(ref rect, ToolbarHeight);
-            modeRect.width = Mathf.Min(180f, modeRect.width);
-            _curveMode = GUI.Toolbar(modeRect, _curveMode, new[] { "Impact", "Slide" }, EditorStyles.miniButton);
+            modeRect.width = Mathf.Min(270f, modeRect.width);
+            _curveMode = GUI.Toolbar(modeRect, _curveMode, new[] { "Impact", "Slide", "Roll" }, EditorStyles.miniButton);
             SerializedObject serializedOwner = new(owner);
             serializedOwner.Update();
-            string prefix = _curveMode == 0 ? "_impact" : "_slide";
+            string prefix = _curveMode switch
+            {
+                0 => "_impact",
+                1 => "_slide",
+                _ => "_roll"
+            };
             SerializedProperty volume = serializedOwner.FindProperty($"{entry.PropertyPath}.{prefix}Volume");
             SerializedProperty pitch = serializedOwner.FindProperty($"{entry.PropertyPath}.{prefix}Pitch");
             if (volume == null || pitch == null)

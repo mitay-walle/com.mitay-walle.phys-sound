@@ -6,7 +6,7 @@ namespace PhysSound
 	{
 		internal AudioSource Source;
 		internal PhysSoundEmitterMode Mode;
-		internal PhysSoundPairKey PairKey;
+		internal PhysSoundContinuousKey ContinuousKey;
 		internal int InteractionIndex;
 		internal Vector3 TargetPosition;
 		internal float TargetVolume;

@@ -10,5 +10,6 @@ namespace PhysSound
 		internal Vector3 Normal;
 		internal Vector3 RelativeVelocity;
 		internal float Impulse;
+		internal float RollSpeed;
 	}
 }

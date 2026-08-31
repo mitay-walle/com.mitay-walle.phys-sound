@@ -4,6 +4,7 @@
 	{
 		Free,
 		Impact,
-		Slide
+		Slide,
+		Roll
 	}
 }

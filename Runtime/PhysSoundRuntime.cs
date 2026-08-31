@@ -9,10 +9,17 @@ namespace PhysSound
 	[NoAutoStaticsCleanup, AddComponentMenu("")]
 	internal sealed class PhysSoundRuntime : MonoBehaviour
 	{
+		private const int RequiredContinuousContactSamples = 3;
+		private const float MinimumTerrainLayerWeight = 0.01f;
+
 		private static PhysSoundRuntime _instance;
         private static bool _configurationWarningShown;
 
 		private readonly Dictionary<PhysicsMaterial, string> _surfaces = new();
+#if PHYS_SOUND_TERRAIN
+		private readonly Dictionary<TerrainLayer, string> _terrainSurfaces = new();
+		private readonly List<PhysSoundWeightedInteraction> _weightedInteractions = new();
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
 		private readonly Dictionary<PhysicsMaterial2D, string> _surfaces2D = new();
 #endif
@@ -21,7 +28,9 @@ namespace PhysSound
 		private readonly HashSet<PhysSoundPairKey> _componentReportedPairs = new();
 		private readonly Dictionary<PhysSoundPairKey, EntityId> _componentContinuousOwners = new();
 		private readonly Dictionary<PhysSoundPairKey, float> _lastImpactTimes = new();
-		private readonly Dictionary<PhysSoundPairKey, int> _slides = new();
+		private readonly Dictionary<PhysSoundContinuousKey, int> _continuousEmitters = new();
+		private readonly Dictionary<PhysSoundContinuousKey, int> _continuousContactSamples = new();
+		private readonly List<PhysSoundContinuousKey> _continuousKeysToRemove = new();
 
 		private PhysSoundSettings _settings;
 		private PhysSoundEmitter[] _emitters;
@@ -93,7 +102,63 @@ namespace PhysSound
 			}
 		}
 
+		internal static bool ReportTriggerEnter(
+			EntityId ownerId,
+			Collider ownCollider,
+			Collider otherCollider,
+			out PhysSoundPairKey pairKey)
+		{
+			pairKey = default;
+
+			if (!EnsureInitialized() || ownCollider == null || otherCollider == null)
+			{
+				return false;
+			}
+
+			return _instance.ProcessTriggerEnter(ownerId, ownCollider, otherCollider, out pairKey);
+		}
+
+		internal static void ReportTriggerStay(
+			EntityId ownerId,
+			PhysSoundPairKey pairKey,
+			Collider ownCollider,
+			Collider otherCollider)
+		{
+			if (EnsureInitialized())
+			{
+				_instance.ProcessTriggerStay(ownerId, pairKey, ownCollider, otherCollider);
+			}
+		}
+
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
+		internal static bool ReportTriggerEnter2D(
+			EntityId ownerId,
+			Collider2D ownCollider,
+			Collider2D otherCollider,
+			out PhysSoundPairKey pairKey)
+		{
+			pairKey = default;
+
+			if (!EnsureInitialized() || ownCollider == null || otherCollider == null)
+			{
+				return false;
+			}
+
+			return _instance.ProcessTriggerEnter2D(ownerId, ownCollider, otherCollider, out pairKey);
+		}
+
+		internal static void ReportTriggerStay2D(
+			EntityId ownerId,
+			PhysSoundPairKey pairKey,
+			Collider2D ownCollider,
+			Collider2D otherCollider)
+		{
+			if (EnsureInitialized())
+			{
+				_instance.ProcessTriggerStay2D(ownerId, pairKey, ownCollider, otherCollider);
+			}
+		}
+
 		internal static bool ReportComponentEnter2D(EntityId ownerId, Collision2D collision, out PhysSoundPairKey pairKey)
 		{
 			pairKey = default;
@@ -202,6 +267,9 @@ namespace PhysSound
 			_settings = settings;
 			_emitters = new PhysSoundEmitter[settings.MaximumVoices];
 			settings.BuildLookups(_surfaces, _interactions, _interactionValues);
+#if PHYS_SOUND_TERRAIN
+			settings.BuildLookupsTerrain(_terrainSurfaces);
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
 			settings.BuildLookups2D(_surfaces2D);
 #endif
@@ -211,6 +279,75 @@ namespace PhysSound
 				Physics.ContactEvent += OnContactEvent;
 				_contactEventSubscribed = true;
 			}
+		}
+
+		private bool ProcessTriggerEnter(
+			EntityId ownerId,
+			Collider ownCollider,
+			Collider otherCollider,
+			out PhysSoundPairKey pairKey)
+		{
+			PhysSoundContactData contact = ReadTrigger(ownCollider, otherCollider);
+			pairKey = GetPairKey(ownCollider, otherCollider);
+
+			if (!TryResolveInteraction(ownCollider, otherCollider, contact.Position, out int interactionIndex))
+			{
+				return false;
+			}
+
+			if (IsFirstComponentReportThisFrame(pairKey))
+			{
+				StopContinuous(pairKey);
+				PlayImpact(pairKey, interactionIndex, contact.Position, contact.Impulse);
+			}
+
+			if (!HasContinuousContact(ownCollider, otherCollider, contact.Position, interactionIndex))
+			{
+				return false;
+			}
+
+			if (!_componentContinuousOwners.TryGetValue(pairKey, out EntityId existingOwner))
+			{
+				_componentContinuousOwners.Add(pairKey, ownerId);
+				return true;
+			}
+
+			return existingOwner == ownerId;
+		}
+
+		private void ProcessTriggerStay(
+			EntityId ownerId,
+			PhysSoundPairKey pairKey,
+			Collider ownCollider,
+			Collider otherCollider)
+		{
+			PhysSoundContactData contact = ReadTrigger(ownCollider, otherCollider);
+			if (!_componentContinuousOwners.TryGetValue(pairKey, out EntityId existingOwner) || existingOwner != ownerId ||
+			    !TryResolveInteraction(ownCollider, otherCollider, contact.Position, out int interactionIndex))
+			{
+				return;
+			}
+
+			float slideSpeed = GetTangentialSpeed(contact.RelativeVelocity, contact.Normal);
+			UpdateContactContinuous(
+				pairKey,
+				ownCollider,
+				otherCollider,
+				interactionIndex,
+				contact.Position,
+				slideSpeed,
+				contact.RollSpeed);
+		}
+
+		private bool IsFirstComponentReportThisFrame(PhysSoundPairKey pairKey)
+		{
+			if (_componentReportFrame != Time.frameCount)
+			{
+				_componentReportFrame = Time.frameCount;
+				_componentReportedPairs.Clear();
+			}
+
+			return _componentReportedPairs.Add(pairKey);
 		}
 
 		private bool ProcessComponentEnter(EntityId ownerId, Collision collision, out PhysSoundPairKey pairKey)
@@ -224,25 +361,18 @@ namespace PhysSound
 
 			pairKey = GetPairKey(contact.FirstCollider, contact.SecondCollider);
 
-			if (!TryResolveInteraction(contact.FirstCollider, contact.SecondCollider, out int interactionIndex))
+			if (!TryResolveInteraction(contact.FirstCollider, contact.SecondCollider, contact.Position, out int interactionIndex))
 			{
 				return false;
 			}
 
-			if (_componentReportFrame != Time.frameCount)
+			if (IsFirstComponentReportThisFrame(pairKey))
 			{
-				_componentReportFrame = Time.frameCount;
-				_componentReportedPairs.Clear();
-			}
-
-			if (_componentReportedPairs.Add(pairKey))
-			{
+				StopContinuous(pairKey);
 				PlayImpact(pairKey, interactionIndex, contact.Position, contact.Impulse);
 			}
 
-			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
-
-			if (!interaction.HasSlide)
+			if (!HasContinuousContact(contact.FirstCollider, contact.SecondCollider, contact.Position, interactionIndex))
 			{
 				return false;
 			}
@@ -260,24 +390,75 @@ namespace PhysSound
 		{
 			if (collision == null || !_componentContinuousOwners.TryGetValue(pairKey, out EntityId registeredOwner) || registeredOwner != ownerId ||
 			    !TryReadCollision(collision, out PhysSoundContactData contact) ||
-			    !TryResolveInteraction(contact.FirstCollider, contact.SecondCollider, out int interactionIndex))
-			{
-				return;
-			}
-
-			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
-
-			if (!interaction.HasSlide)
+			    !TryResolveInteraction(contact.FirstCollider, contact.SecondCollider, contact.Position, out int interactionIndex))
 			{
 				return;
 			}
 
 			float slideSpeed = GetTangentialSpeed(contact.RelativeVelocity, contact.Normal);
-
-			UpdateSlide(pairKey, interactionIndex, contact.Position, slideSpeed);
+			UpdateContactContinuous(
+				pairKey,
+				contact.FirstCollider,
+				contact.SecondCollider,
+				interactionIndex,
+				contact.Position,
+				slideSpeed,
+				contact.RollSpeed);
 		}
 
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
+		private bool ProcessTriggerEnter2D(
+			EntityId ownerId,
+			Collider2D ownCollider,
+			Collider2D otherCollider,
+			out PhysSoundPairKey pairKey)
+		{
+			PhysSoundContactData2D contact = ReadTrigger2D(ownCollider, otherCollider);
+			pairKey = GetPairKey(ownCollider, otherCollider);
+
+			if (!TryResolveInteraction(ownCollider, otherCollider, out int interactionIndex))
+			{
+				return false;
+			}
+
+			if (IsFirstComponentReportThisFrame(pairKey))
+			{
+				StopContinuous(pairKey);
+				PlayImpact(pairKey, interactionIndex, contact.Position, contact.Impulse);
+			}
+
+			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
+			if (!interaction.HasSlide && !interaction.HasRoll)
+			{
+				return false;
+			}
+
+			if (!_componentContinuousOwners.TryGetValue(pairKey, out EntityId existingOwner))
+			{
+				_componentContinuousOwners.Add(pairKey, ownerId);
+				return true;
+			}
+
+			return existingOwner == ownerId;
+		}
+
+		private void ProcessTriggerStay2D(
+			EntityId ownerId,
+			PhysSoundPairKey pairKey,
+			Collider2D ownCollider,
+			Collider2D otherCollider)
+		{
+			if (!_componentContinuousOwners.TryGetValue(pairKey, out EntityId existingOwner) || existingOwner != ownerId ||
+			    !TryResolveInteraction(ownCollider, otherCollider, out int interactionIndex))
+			{
+				return;
+			}
+
+			PhysSoundContactData2D contact = ReadTrigger2D(ownCollider, otherCollider);
+			float slideSpeed = GetTangentialSpeed(contact.RelativeVelocity, contact.Normal);
+			UpdateContactContinuous(pairKey, interactionIndex, contact.Position, slideSpeed, contact.RollSpeed);
+		}
+
 		private bool ProcessComponentEnter2D(EntityId ownerId, Collision2D collision, out PhysSoundPairKey pairKey)
 		{
 			pairKey = default;
@@ -294,20 +475,15 @@ namespace PhysSound
 				return false;
 			}
 
-			if (_componentReportFrame != Time.frameCount)
+			if (IsFirstComponentReportThisFrame(pairKey))
 			{
-				_componentReportFrame = Time.frameCount;
-				_componentReportedPairs.Clear();
-			}
-
-			if (_componentReportedPairs.Add(pairKey))
-			{
+				StopContinuous(pairKey);
 				PlayImpact(pairKey, interactionIndex, contact.Position, contact.Impulse);
 			}
 
 			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
 
-			if (!interaction.HasSlide)
+			if (!interaction.HasSlide && !interaction.HasRoll)
 			{
 				return false;
 			}
@@ -334,13 +510,13 @@ namespace PhysSound
 
 			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
 
-			if (!interaction.HasSlide)
+			if (!interaction.HasSlide && !interaction.HasRoll)
 			{
 				return;
 			}
 
 			float slideSpeed = GetTangentialSpeed(contact.RelativeVelocity, contact.Normal);
-			UpdateSlide(pairKey, interactionIndex, contact.Position, slideSpeed);
+			UpdateContactContinuous(pairKey, interactionIndex, contact.Position, slideSpeed, contact.RollSpeed);
 		}
 #endif
 
@@ -349,7 +525,7 @@ namespace PhysSound
 			if (_componentContinuousOwners.TryGetValue(pairKey, out EntityId registeredOwner) && registeredOwner == ownerId)
 			{
 				_componentContinuousOwners.Remove(pairKey);
-				StopSlide(pairKey);
+				StopContinuous(pairKey);
 			}
 		}
 
@@ -379,28 +555,34 @@ namespace PhysSound
 
 					if (pair.isCollisionExit)
 					{
-						StopSlide(pairKey);
+						StopContinuous(pairKey);
 						continue;
 					}
 
 					if (!TryReadContactPair(header, pair, firstCollider, secondCollider, out PhysSoundContactData contact) ||
-					    !TryResolveInteraction(firstCollider, secondCollider, out int interactionIndex))
+					    !TryResolveInteraction(firstCollider, secondCollider, contact.Position, out int interactionIndex))
 					{
 						continue;
 					}
 
 					if (pair.isCollisionEnter)
 					{
+						StopContinuous(pairKey);
 						PlayImpact(pairKey, interactionIndex, contact.Position, contact.Impulse);
 					}
 
-					PhysSoundInteraction interaction = _interactionValues[interactionIndex];
-
-					if (pair.isCollisionStay && interaction.HasSlide)
+					if (pair.isCollisionStay &&
+					    HasContinuousContact(firstCollider, secondCollider, contact.Position, interactionIndex))
 					{
 						float slideSpeed = GetTangentialSpeed(contact.RelativeVelocity, contact.Normal);
-
-						UpdateSlide(pairKey, interactionIndex, contact.Position, slideSpeed);
+						UpdateContactContinuous(
+							pairKey,
+							firstCollider,
+							secondCollider,
+							interactionIndex,
+							contact.Position,
+							slideSpeed,
+							contact.RollSpeed);
 					}
 				}
 			}
@@ -441,17 +623,157 @@ namespace PhysSound
 
 		private void UpdateSlide(PhysSoundPairKey pairKey, int interactionIndex, Vector3 position, float speed)
 		{
-			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
-			float targetVolume = interaction.EvaluateSlideVolume(speed);
+			UpdateContinuous(pairKey, interactionIndex, position, speed, 1f, PhysSoundEmitterMode.Slide);
+		}
 
-			if (!_slides.TryGetValue(pairKey, out int emitterIndex))
+		private void UpdateContactContinuous(
+			PhysSoundPairKey pairKey,
+			int interactionIndex,
+			Vector3 position,
+			float slideSpeed,
+			float rollSpeed,
+			float weight = 1f)
+		{
+			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
+
+			if (interaction.HasSlide)
+			{
+				UpdateContinuous(pairKey, interactionIndex, position, slideSpeed, weight, PhysSoundEmitterMode.Slide);
+			}
+
+			if (interaction.HasRoll)
+			{
+				UpdateContinuous(pairKey, interactionIndex, position, rollSpeed, weight, PhysSoundEmitterMode.Roll);
+			}
+		}
+
+		private void UpdateContactContinuous(
+			PhysSoundPairKey pairKey,
+			Collider firstCollider,
+			Collider secondCollider,
+			int fallbackInteractionIndex,
+			Vector3 position,
+			float slideSpeed,
+			float rollSpeed)
+		{
+#if PHYS_SOUND_TERRAIN
+			if (TryBuildTerrainInteractions(firstCollider, secondCollider, position))
+			{
+				for (int i = 0; i < _weightedInteractions.Count; i++)
+				{
+					PhysSoundWeightedInteraction weighted = _weightedInteractions[i];
+					UpdateContactContinuous(
+						pairKey,
+						weighted.InteractionIndex,
+						position,
+						slideSpeed,
+						rollSpeed,
+						weighted.Weight);
+				}
+
+				RemoveInactiveTerrainCandidates(pairKey);
+				return;
+			}
+#endif
+
+			UpdateContactContinuous(pairKey, fallbackInteractionIndex, position, slideSpeed, rollSpeed);
+		}
+
+#if PHYS_SOUND_TERRAIN
+		private void RemoveInactiveTerrainCandidates(PhysSoundPairKey pairKey)
+		{
+			_continuousKeysToRemove.Clear();
+			foreach (PhysSoundContinuousKey key in _continuousContactSamples.Keys)
+			{
+				if (key.PairKey.Equals(pairKey) && !ContainsWeightedInteraction(key.InteractionIndex))
+				{
+					_continuousKeysToRemove.Add(key);
+				}
+			}
+
+			for (int i = 0; i < _continuousKeysToRemove.Count; i++)
+			{
+				_continuousContactSamples.Remove(_continuousKeysToRemove[i]);
+			}
+		}
+
+		private bool ContainsWeightedInteraction(int interactionIndex)
+		{
+			for (int i = 0; i < _weightedInteractions.Count; i++)
+			{
+				if (_weightedInteractions[i].InteractionIndex == interactionIndex)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+#endif
+
+		private bool HasContinuousContact(
+			Collider firstCollider,
+			Collider secondCollider,
+			Vector3 position,
+			int fallbackInteractionIndex)
+		{
+#if PHYS_SOUND_TERRAIN
+			if (TryBuildTerrainInteractions(firstCollider, secondCollider, position))
+			{
+				for (int i = 0; i < _weightedInteractions.Count; i++)
+				{
+					PhysSoundInteraction interaction = _interactionValues[_weightedInteractions[i].InteractionIndex];
+					if (interaction.HasSlide || interaction.HasRoll)
+					{
+						return true;
+					}
+				}
+
+				return false;
+			}
+#endif
+
+			PhysSoundInteraction fallback = _interactionValues[fallbackInteractionIndex];
+			return fallback.HasSlide || fallback.HasRoll;
+		}
+
+		private void UpdateRoll(PhysSoundPairKey pairKey, int interactionIndex, Vector3 position, float speed)
+		{
+			UpdateContinuous(pairKey, interactionIndex, position, speed, 1f, PhysSoundEmitterMode.Roll);
+		}
+
+		private void UpdateContinuous(
+			PhysSoundPairKey pairKey,
+			int interactionIndex,
+			Vector3 position,
+			float speed,
+			float weight,
+			PhysSoundEmitterMode mode)
+		{
+			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
+			float targetVolume = EvaluateContinuousVolume(interaction, speed, mode) * Mathf.Clamp01(weight);
+			PhysSoundContinuousKey continuousKey = new PhysSoundContinuousKey(pairKey, interactionIndex, mode);
+
+			if (!_continuousEmitters.TryGetValue(continuousKey, out int emitterIndex))
 			{
 				if (targetVolume <= 0f)
 				{
+					_continuousContactSamples.Remove(continuousKey);
 					return;
 				}
 
-				AudioClip clip = interaction.GetSlideClip();
+				int contactSamples = _continuousContactSamples.TryGetValue(continuousKey, out int previousSamples)
+					? previousSamples + 1
+					: 1;
+
+				if (contactSamples < RequiredContinuousContactSamples)
+				{
+					_continuousContactSamples[continuousKey] = contactSamples;
+					return;
+				}
+
+				_continuousContactSamples.Remove(continuousKey);
+				AudioClip clip = GetContinuousClip(interaction, mode);
 
 				if (clip == null)
 				{
@@ -459,57 +781,75 @@ namespace PhysSound
 				}
 
 				emitterIndex = AcquireEmitter();
-				PrepareEmitter(emitterIndex, PhysSoundEmitterMode.Slide, position);
+				PrepareEmitter(emitterIndex, mode, position);
 
 				ref PhysSoundEmitter created = ref _emitters[emitterIndex];
-				created.PairKey = pairKey;
+				created.ContinuousKey = continuousKey;
 				created.InteractionIndex = interactionIndex;
 				created.Source.loop = true;
 				created.Source.resource = clip;
 				created.Source.volume = 0f;
-				created.Source.pitch = interaction.EvaluateSlidePitch(speed);
+				created.Source.pitch = EvaluateContinuousPitch(interaction, speed, mode);
 				created.Source.Play();
 
-				_slides.Add(pairKey, emitterIndex);
-			}
-			else
-			{
-				ref PhysSoundEmitter existing = ref _emitters[emitterIndex];
-
-				if (existing.InteractionIndex != interactionIndex)
-				{
-					AudioClip clip = interaction.GetSlideClip();
-
-					if (clip == null)
-					{
-						StopSlide(pairKey);
-						return;
-					}
-
-					existing.InteractionIndex = interactionIndex;
-					existing.Source.Stop();
-					existing.Source.resource = clip;
-					existing.Source.loop = true;
-					existing.Source.Play();
-				}
+				_continuousEmitters.Add(continuousKey, emitterIndex);
 			}
 
 			ref PhysSoundEmitter emitter = ref _emitters[emitterIndex];
 			emitter.TargetPosition = position;
 			emitter.TargetVolume = targetVolume;
-			emitter.TargetPitch = interaction.EvaluateSlidePitch(speed);
+			emitter.TargetPitch = EvaluateContinuousPitch(interaction, speed, mode);
 			emitter.LastSeenAt = Time.unscaledTime;
 			emitter.Stopping = false;
 		}
 
-		private void StopSlide(PhysSoundPairKey pairKey)
+		private void StopContinuous(PhysSoundPairKey pairKey)
 		{
-			if (_slides.TryGetValue(pairKey, out int emitterIndex))
+			_continuousKeysToRemove.Clear();
+
+			foreach ((PhysSoundContinuousKey key, int emitterIndex) in _continuousEmitters)
 			{
+				if (!key.PairKey.Equals(pairKey))
+				{
+					continue;
+				}
+
 				ref PhysSoundEmitter emitter = ref _emitters[emitterIndex];
 				emitter.TargetVolume = 0f;
 				emitter.Stopping = true;
 			}
+
+			foreach (PhysSoundContinuousKey key in _continuousContactSamples.Keys)
+			{
+				if (key.PairKey.Equals(pairKey))
+				{
+					_continuousKeysToRemove.Add(key);
+				}
+			}
+
+			for (int i = 0; i < _continuousKeysToRemove.Count; i++)
+			{
+				_continuousContactSamples.Remove(_continuousKeysToRemove[i]);
+			}
+		}
+
+		private static AudioClip GetContinuousClip(PhysSoundInteraction interaction, PhysSoundEmitterMode mode)
+		{
+			return mode == PhysSoundEmitterMode.Roll ? interaction.GetRollClip() : interaction.GetSlideClip();
+		}
+
+		private static float EvaluateContinuousVolume(PhysSoundInteraction interaction, float speed, PhysSoundEmitterMode mode)
+		{
+			return mode == PhysSoundEmitterMode.Roll
+				? interaction.EvaluateRollVolume(speed)
+				: interaction.EvaluateSlideVolume(speed);
+		}
+
+		private static float EvaluateContinuousPitch(PhysSoundInteraction interaction, float speed, PhysSoundEmitterMode mode)
+		{
+			return mode == PhysSoundEmitterMode.Roll
+				? interaction.EvaluateRollPitch(speed)
+				: interaction.EvaluateSlidePitch(speed);
 		}
 
 		private void Update()
@@ -637,7 +977,7 @@ namespace PhysSound
             source.transform.position = position;
 
 			emitter.Mode = mode;
-			emitter.PairKey = default;
+			emitter.ContinuousKey = default;
 			emitter.InteractionIndex = -1;
 			emitter.TargetPosition = position;
 			emitter.TargetVolume = 0f;
@@ -651,10 +991,11 @@ namespace PhysSound
 		{
 			ref PhysSoundEmitter emitter = ref _emitters[emitterIndex];
 
-			if (emitter.Mode == PhysSoundEmitterMode.Slide && _slides.TryGetValue(emitter.PairKey, out int registeredIndex) &&
+			if ((emitter.Mode == PhysSoundEmitterMode.Slide || emitter.Mode == PhysSoundEmitterMode.Roll) &&
+			    _continuousEmitters.TryGetValue(emitter.ContinuousKey, out int registeredIndex) &&
 			    registeredIndex == emitterIndex)
 			{
-				_slides.Remove(emitter.PairKey);
+				_continuousEmitters.Remove(emitter.ContinuousKey);
 			}
 
 			emitter.Source.Stop();
@@ -664,7 +1005,7 @@ namespace PhysSound
 			emitter.Source.pitch = 1f;
 
 			emitter.Mode = PhysSoundEmitterMode.Free;
-			emitter.PairKey = default;
+			emitter.ContinuousKey = default;
 			emitter.InteractionIndex = -1;
 			emitter.TargetVolume = 0f;
 			emitter.TargetPitch = 1f;
@@ -679,14 +1020,40 @@ namespace PhysSound
 				return float.NegativeInfinity;
 			}
 
-			float modePenalty = emitter.Mode == PhysSoundEmitterMode.Slide ? 1f : 0f;
+			float modePenalty = emitter.Mode == PhysSoundEmitterMode.Slide || emitter.Mode == PhysSoundEmitterMode.Roll ? 1f : 0f;
 			return modePenalty + emitter.Source.volume;
 		}
 
-		private bool TryResolveInteraction(Collider firstCollider, Collider secondCollider, out int interactionIndex)
+		private bool TryResolveInteraction(
+			Collider firstCollider,
+			Collider secondCollider,
+			Vector3 position,
+			out int interactionIndex)
 		{
+#if PHYS_SOUND_TERRAIN
+			if (TryBuildTerrainInteractions(firstCollider, secondCollider, position))
+			{
+				PhysSoundWeightedInteraction dominant = _weightedInteractions[0];
+				for (int i = 1; i < _weightedInteractions.Count; i++)
+				{
+					if (_weightedInteractions[i].Weight > dominant.Weight)
+					{
+						dominant = _weightedInteractions[i];
+					}
+				}
+
+				interactionIndex = dominant.InteractionIndex;
+				return true;
+			}
+#endif
+
 			string firstSurface = GetSurface(firstCollider.sharedMaterial);
 			string secondSurface = GetSurface(secondCollider.sharedMaterial);
+			return TryResolveInteraction(firstSurface, secondSurface, out interactionIndex);
+		}
+
+		private bool TryResolveInteraction(string firstSurface, string secondSurface, out int interactionIndex)
+		{
 
 			return _interactions.TryGetValue(new PhysSoundInteractionKey(firstSurface, secondSurface), out interactionIndex) ||
 			       _interactions.TryGetValue(new PhysSoundInteractionKey(firstSurface, PhysSoundSettings.AnySurface), out interactionIndex) ||
@@ -694,6 +1061,85 @@ namespace PhysSound
 			       _interactions.TryGetValue(new PhysSoundInteractionKey(PhysSoundSettings.DefaultSurface, PhysSoundSettings.AnySurface),
 				       out interactionIndex);
 		}
+
+#if PHYS_SOUND_TERRAIN
+		private bool TryBuildTerrainInteractions(Collider firstCollider, Collider secondCollider, Vector3 position)
+		{
+			TerrainCollider terrainCollider = firstCollider as TerrainCollider ?? secondCollider as TerrainCollider;
+			if (terrainCollider == null || terrainCollider.terrainData == null)
+			{
+				return false;
+			}
+
+			Collider otherCollider = ReferenceEquals(terrainCollider, firstCollider) ? secondCollider : firstCollider;
+			string otherSurface = GetSurface(otherCollider.sharedMaterial);
+			TerrainData terrainData = terrainCollider.terrainData;
+			TerrainLayer[] layers = terrainData.terrainLayers;
+			Vector3 localPosition = terrainCollider.transform.InverseTransformPoint(position);
+			float normalizedX = terrainData.size.x <= 0f ? 0f : Mathf.Clamp01(localPosition.x / terrainData.size.x);
+			float normalizedZ = terrainData.size.z <= 0f ? 0f : Mathf.Clamp01(localPosition.z / terrainData.size.z);
+
+			_weightedInteractions.Clear();
+			int sampledAlphamapIndex = -1;
+			Color sampledWeights = default;
+			for (int layerIndex = 0; layerIndex < layers.Length; layerIndex++)
+			{
+				int alphamapIndex = layerIndex / 4;
+				if (alphamapIndex != sampledAlphamapIndex)
+				{
+					sampledAlphamapIndex = alphamapIndex;
+					sampledWeights = terrainData.GetAlphamapTexture(alphamapIndex).GetPixelBilinear(normalizedX, normalizedZ);
+				}
+
+				float weight = GetColorChannel(sampledWeights, layerIndex % 4);
+
+				if (weight < MinimumTerrainLayerWeight)
+				{
+					continue;
+				}
+
+				TerrainLayer layer = layers[layerIndex];
+				string terrainSurface = layer != null && _terrainSurfaces.TryGetValue(layer, out string mappedSurface)
+					? mappedSurface
+					: PhysSoundSettings.DefaultSurface;
+
+				if (!TryResolveInteraction(otherSurface, terrainSurface, out int interactionIndex))
+				{
+					continue;
+				}
+
+				AddWeightedInteraction(interactionIndex, weight);
+			}
+
+			return _weightedInteractions.Count > 0;
+		}
+
+		private void AddWeightedInteraction(int interactionIndex, float weight)
+		{
+			for (int i = 0; i < _weightedInteractions.Count; i++)
+			{
+				PhysSoundWeightedInteraction current = _weightedInteractions[i];
+				if (current.InteractionIndex == interactionIndex)
+				{
+					_weightedInteractions[i] = new PhysSoundWeightedInteraction(interactionIndex, current.Weight + weight);
+					return;
+				}
+			}
+
+			_weightedInteractions.Add(new PhysSoundWeightedInteraction(interactionIndex, weight));
+		}
+
+		private static float GetColorChannel(Color color, int channel)
+		{
+			return channel switch
+			{
+				0 => color.r,
+				1 => color.g,
+				2 => color.b,
+				_ => color.a
+			};
+		}
+#endif
 
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
 		private bool TryResolveInteraction(Collider2D firstCollider, Collider2D secondCollider, out int interactionIndex)
@@ -720,6 +1166,26 @@ namespace PhysSound
 			return material != null && _surfaces2D.TryGetValue(material, out string surface)
 				? surface
 				: PhysSoundSettings.DefaultSurface;
+		}
+
+		private static PhysSoundContactData2D ReadTrigger2D(Collider2D firstCollider, Collider2D secondCollider)
+		{
+			Vector2 firstPoint = firstCollider.ClosestPoint(secondCollider.bounds.center);
+			Vector2 secondPoint = secondCollider.ClosestPoint(firstPoint);
+			Vector3 position = (firstPoint + secondPoint) * 0.5f;
+			Vector3 relativeVelocity = GetPointVelocity(firstCollider.attachedRigidbody, position) -
+			                           GetPointVelocity(secondCollider.attachedRigidbody, position);
+
+			return new PhysSoundContactData2D
+			{
+				FirstCollider = firstCollider,
+				SecondCollider = secondCollider,
+				Position = position,
+				Normal = Vector3.zero,
+				RelativeVelocity = relativeVelocity,
+				Impulse = relativeVelocity.magnitude,
+				RollSpeed = GetRollSpeed(firstCollider, secondCollider, position)
+			};
 		}
 
 		private static bool TryReadCollision2D(Collision2D collision, out PhysSoundContactData2D contact)
@@ -765,13 +1231,35 @@ namespace PhysSound
 				SecondCollider = secondCollider,
 				Position = position / count,
 				Normal = normal.sqrMagnitude > 0f ? normal.normalized : Vector3.up,
-				RelativeVelocity = collision.relativeVelocity,
-				Impulse = impulse
+				RelativeVelocity = GetPointVelocity(firstCollider.attachedRigidbody, position / count) -
+				                   GetPointVelocity(secondCollider.attachedRigidbody, position / count),
+				Impulse = impulse,
+				RollSpeed = GetRollSpeed(firstCollider, secondCollider, position / count)
 			};
 
 			return true;
 		}
 #endif
+
+		private static PhysSoundContactData ReadTrigger(Collider firstCollider, Collider secondCollider)
+		{
+			Vector3 firstPoint = firstCollider.ClosestPoint(secondCollider.bounds.center);
+			Vector3 secondPoint = secondCollider.ClosestPoint(firstPoint);
+			Vector3 position = (firstPoint + secondPoint) * 0.5f;
+			Vector3 relativeVelocity = GetPointVelocity(firstCollider.attachedRigidbody, position) -
+			                           GetPointVelocity(secondCollider.attachedRigidbody, position);
+
+			return new PhysSoundContactData
+			{
+				FirstCollider = firstCollider,
+				SecondCollider = secondCollider,
+				Position = position,
+				Normal = Vector3.zero,
+				RelativeVelocity = relativeVelocity,
+				Impulse = relativeVelocity.magnitude,
+				RollSpeed = GetRollSpeed(firstCollider, secondCollider, position)
+			};
+		}
 
 		private static bool TryReadCollision(Collision collision, out PhysSoundContactData contact)
 		{
@@ -817,8 +1305,10 @@ namespace PhysSound
 				SecondCollider = secondCollider,
 				Position = position / totalWeight,
 				Normal = normal.sqrMagnitude > 0f ? normal.normalized : Vector3.up,
-				RelativeVelocity = collision.relativeVelocity,
-				Impulse = collision.impulse.magnitude
+				RelativeVelocity = GetPointVelocity(firstCollider.attachedRigidbody, position / totalWeight) -
+				                   GetPointVelocity(secondCollider.attachedRigidbody, position / totalWeight),
+				Impulse = collision.impulse.magnitude,
+				RollSpeed = GetRollSpeed(firstCollider, secondCollider, position / totalWeight)
 			};
 
 			return true;
@@ -865,7 +1355,10 @@ namespace PhysSound
 				Position = position,
 				Normal = normal.sqrMagnitude > 0f ? normal.normalized : Vector3.up,
 				RelativeVelocity = firstVelocity - secondVelocity,
-				Impulse = impulse.magnitude
+				Impulse = impulse.magnitude,
+				RollSpeed = Mathf.Max(
+					GetAngularPointSpeed(header.body, header.bodyAngularVelocity, position),
+					GetAngularPointSpeed(header.otherBody, header.otherBodyAngularVelocity, position))
 			};
 
 			return true;
@@ -878,21 +1371,78 @@ namespace PhysSound
 				return Vector3.zero;
 			}
 
-			return linearVelocity + Vector3.Cross(angularVelocity, point - body.transform.position);
+			return linearVelocity + Vector3.Cross(angularVelocity, point - GetWorldCenterOfMass(body));
 		}
+
+		private static Vector3 GetPointVelocity(Rigidbody body, Vector3 point)
+		{
+			return body == null ? Vector3.zero : body.GetPointVelocity(point);
+		}
+
+#if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
+		private static Vector3 GetPointVelocity(Rigidbody2D body, Vector3 point)
+		{
+			return body == null ? Vector3.zero : body.GetPointVelocity(point);
+		}
+#endif
+
+		private static float GetAngularPointSpeed(Component body, Vector3 angularVelocity, Vector3 point)
+		{
+			return body == null ? 0f : Vector3.Cross(angularVelocity, point - GetWorldCenterOfMass(body)).magnitude;
+		}
+
+		private static Vector3 GetWorldCenterOfMass(Component body)
+		{
+			return body switch
+			{
+				Rigidbody rigidbody => rigidbody.worldCenterOfMass,
+				ArticulationBody articulationBody => articulationBody.worldCenterOfMass,
+				_ => body == null ? Vector3.zero : body.transform.position
+			};
+		}
+
+		private static float GetRollSpeed(Collider firstCollider, Collider secondCollider, Vector3 point)
+		{
+			return Mathf.Max(GetRollSpeed(firstCollider, point), GetRollSpeed(secondCollider, point));
+		}
+
+		private static float GetRollSpeed(Collider collider, Vector3 point)
+		{
+			Rigidbody body = collider == null ? null : collider.attachedRigidbody;
+			return body == null ? 0f : Vector3.Cross(body.angularVelocity, point - body.worldCenterOfMass).magnitude;
+		}
+
+#if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
+		private static float GetRollSpeed(Collider2D firstCollider, Collider2D secondCollider, Vector3 point)
+		{
+			return Mathf.Max(GetRollSpeed(firstCollider, point), GetRollSpeed(secondCollider, point));
+		}
+
+		private static float GetRollSpeed(Collider2D collider, Vector3 point)
+		{
+			Rigidbody2D body = collider == null ? null : collider.attachedRigidbody;
+			if (body == null)
+			{
+				return 0f;
+			}
+
+			float radius = Vector2.Distance(body.worldCenterOfMass, point);
+			return Mathf.Abs(body.angularVelocity) * Mathf.Deg2Rad * radius;
+		}
+#endif
 
 		private static float GetTangentialSpeed(Vector3 relativeVelocity, Vector3 normal)
 		{
 			return Vector3.ProjectOnPlane(relativeVelocity, normal).magnitude;
 		}
 
-		private static PhysSoundPairKey GetPairKey(Collider firstCollider, Collider secondCollider)
+		internal static PhysSoundPairKey GetPairKey(Collider firstCollider, Collider secondCollider)
 		{
 			return new PhysSoundPairKey(firstCollider.GetEntityId(), secondCollider.GetEntityId());
 		}
 
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
-		private static PhysSoundPairKey GetPairKey(Collider2D firstCollider, Collider2D secondCollider)
+		internal static PhysSoundPairKey GetPairKey(Collider2D firstCollider, Collider2D secondCollider)
 		{
 			return new PhysSoundPairKey(firstCollider.GetEntityId(), secondCollider.GetEntityId());
 		}
@@ -914,7 +1464,9 @@ namespace PhysSound
 				}
 			}
 
-			_slides.Clear();
+			_continuousEmitters.Clear();
+			_continuousContactSamples.Clear();
+			_continuousKeysToRemove.Clear();
 
 			if (_instance == this)
 			{
@@ -922,5 +1474,19 @@ namespace PhysSound
 			}
 		}
 	}
+
+#if PHYS_SOUND_TERRAIN
+	internal readonly struct PhysSoundWeightedInteraction
+	{
+		internal PhysSoundWeightedInteraction(int interactionIndex, float weight)
+		{
+			InteractionIndex = interactionIndex;
+			Weight = weight;
+		}
+
+		internal int InteractionIndex { get; }
+		internal float Weight { get; }
+	}
+#endif
 }
 #endif

@@ -2,4 +2,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("com.mitay-walle.phys-sound.editor")]
+[assembly: InternalsVisibleTo("com.mitay-walle.phys-sound.tests.editor")]
 #endif

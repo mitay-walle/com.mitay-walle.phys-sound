@@ -15,6 +15,9 @@ namespace PhysSound
     internal sealed class PhysSoundSurface
     {
         [SerializeField] private PhysicsMaterial[] _materials = Array.Empty<PhysicsMaterial>();
+#if PHYS_SOUND_TERRAIN
+        [SerializeField] private TerrainLayer[] _terrainLayers = Array.Empty<TerrainLayer>();
+#endif
 #if PHYS_SOUND_2D
 #if PHYS_SOUND_DISABLE_2D
         [HideInInspector]
@@ -22,6 +25,9 @@ namespace PhysSound
         [SerializeField] private PhysicsMaterial2D[] _materials2D = Array.Empty<PhysicsMaterial2D>();
 #endif
         internal PhysicsMaterial[] Materials => _materials;
+#if PHYS_SOUND_TERRAIN
+        internal TerrainLayer[] TerrainLayers => _terrainLayers;
+#endif
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
         internal PhysicsMaterial2D[] Materials2D => _materials2D;
 #endif
@@ -220,6 +226,15 @@ namespace PhysSound
         [SerializeField, HideInInspector] private Vector2 _slidePitchRange = new Vector2(0.9f, 1.2f);
         [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0.1f, 3f)] private AnimationCurve _slidePitch = AnimationCurve.Linear(0f, 0.9f, 1f, 1.2f);
 
+        [Header("Roll")]
+        [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _rollClips = Array.Empty<AudioClip>();
+        [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0f, 1f)] private AnimationCurve _rollVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        [SerializeField, PhysSoundLabel("Volume"), Min(0f)] private float _rollVolumeMultiplier = 1f;
+        [SerializeField, PhysSoundMinMax(nameof(_maximumRollSpeed), 0f, 300f, "Speed")]
+        private float _minimumRollSpeed = 0.05f;
+        [SerializeField, HideInInspector] private float _maximumRollSpeed = 5f;
+        [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0.1f, 3f)] private AnimationCurve _rollPitch = AnimationCurve.Linear(0f, 0.9f, 1f, 1.2f);
+
         [SerializeField, HideInInspector] private AudioClip _impactSourceClip;
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _impactRegions = new();
         [SerializeField, HideInInspector] private List<PhysSoundImpactRange> _impactRanges = new();
@@ -228,6 +243,7 @@ namespace PhysSound
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _slideRegions = new();
 
         internal bool HasSlide => HasValidClip(_slideClips);
+        internal bool HasRoll => HasValidClip(_rollClips);
         internal List<PhysSoundImpactRange> ImpactRanges => _impactRanges;
         internal float MinimumImpactImpulse => _minimumImpactImpulse;
         internal float MaximumImpactImpulse => _maximumImpactImpulse;
@@ -362,6 +378,11 @@ namespace PhysSound
             return GetRandomClip(_slideClips);
         }
 
+        internal AudioClip GetRollClip()
+        {
+            return GetRandomClip(_rollClips);
+        }
+
         internal float EvaluateImpactVolume(float impulse)
         {
             if (impulse < _minimumImpactImpulse)
@@ -408,6 +429,30 @@ namespace PhysSound
                 : Mathf.InverseLerp(_minimumSlideSpeed, _maximumSlideSpeed, speed);
 
             return Mathf.Max(0.01f, _slidePitch.Evaluate(normalized));
+        }
+
+        internal float EvaluateRollVolume(float speed)
+        {
+            if (speed < _minimumRollSpeed)
+            {
+                return 0f;
+            }
+
+            float normalized = _maximumRollSpeed <= _minimumRollSpeed
+                ? 1f
+                : Mathf.InverseLerp(_minimumRollSpeed, _maximumRollSpeed, speed);
+
+            float value = _rollVolume == null ? normalized : _rollVolume.Evaluate(normalized);
+            return Mathf.Max(0f, value) * _rollVolumeMultiplier;
+        }
+
+        internal float EvaluateRollPitch(float speed)
+        {
+            float normalized = _maximumRollSpeed <= _minimumRollSpeed
+                ? 1f
+                : Mathf.InverseLerp(_minimumRollSpeed, _maximumRollSpeed, speed);
+
+            return Mathf.Max(0.01f, _rollPitch.Evaluate(normalized));
         }
 
         private static AnimationCurve CreateTwoPointCurve(AnimationCurve source, float minimum, float maximum)
@@ -665,6 +710,29 @@ namespace PhysSound
         }
 #endif
 
+#if PHYS_SOUND_TERRAIN
+        internal void BuildLookupsTerrain(Dictionary<TerrainLayer, string> surfaces)
+        {
+            surfaces.Clear();
+            AppendProfileTerrain(_surfaces, surfaces);
+
+            if (_externalSubprofiles == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _externalSubprofiles.Length; i++)
+            {
+                PhysSoundSubprofile subprofile = _externalSubprofiles[i];
+
+                if (subprofile != null)
+                {
+                    AppendProfileTerrain(subprofile.Surfaces, surfaces);
+                }
+            }
+        }
+#endif
+
         internal static string NormalizeSurfaceName(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? DefaultSurface : value.Trim();
@@ -765,6 +833,39 @@ namespace PhysSound
                     if (material != null)
                     {
                         surfaces[material] = normalizedSurfaceName;
+                    }
+                }
+            }
+        }
+#endif
+
+#if PHYS_SOUND_TERRAIN
+        private static void AppendProfileTerrain(
+            Dictionary<string, PhysSoundSurface> profileSurfaces,
+            Dictionary<TerrainLayer, string> surfaces)
+        {
+            if (profileSurfaces == null)
+            {
+                return;
+            }
+
+            foreach ((string surfaceName, PhysSoundSurface surface) in profileSurfaces)
+            {
+                if (string.IsNullOrWhiteSpace(surfaceName) || surface == null)
+                {
+                    continue;
+                }
+
+                TerrainLayer[] layers = surface.TerrainLayers;
+                string normalizedSurfaceName = surfaceName.Trim();
+
+                for (int i = 0; i < layers.Length; i++)
+                {
+                    TerrainLayer layer = layers[i];
+
+                    if (layer != null)
+                    {
+                        surfaces[layer] = normalizedSurfaceName;
                     }
                 }
             }
