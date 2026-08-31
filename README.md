@@ -4,15 +4,13 @@ Phys Sound turns Unity 3D and 2D collision contacts into positioned impact and s
 
 ![Phys Sound settings](Documentation/Screenshot_1.png)
 
-External subprofiles extend the main settings in array order. A later subprofile overrides matching surfaces and interactions from the main settings or earlier subprofiles. The **Default Interaction** always belongs to the main settings.
-
 | Field | Description |
 | --- | --- |
-| **Contact Backend** | Selects the Physics 3D integration: **Provides Contacts** or **Components**. |
-| **External Subprofiles** | Ordered reusable profiles. Later entries have higher priority for matching surfaces and interactions. |
-| **Surfaces** | Named groups of `PhysicsMaterial` and `PhysicsMaterial2D` assets, edited in the **Materials** tab. |
-| **Default Interaction** | Final fallback when no exact or `Any` mapping matches the contacting surfaces. |
-| **Interactions** | Impact and slide settings for surface pairs, edited through the tabs in the Phys Sound Editor. |
+| **Contact Backend** | Selects the Physics 3D integration. **Provides Contacts** requires enabling the standard **Provides Contacts** flag on participating colliders, but no `PhysSoundObject` component is needed. **Components** requires `PhysSoundObject` on the root that receives collision callbacks, normally the `Rigidbody` GameObject. This setting does not affect Physics 2D, which always uses `PhysSoundObject`. |
+| **External Subprofiles** | Extends the main settings in array order. A later subprofile overrides matching surfaces and interactions from the main settings or earlier subprofiles. The **Default Interaction** always belongs to the main settings. |
+| **Surfaces** | Named groups of `PhysicsMaterial` and `PhysicsMaterial2D`, edited in [Materials](#materials). |
+| **Default Interaction** | Final fallback when no exact or `Any` mapping from [Mapping](#mapping) matches the contacting surfaces. |
+| **Interactions** | Impact and slide settings for surface pairs, edited in [Mapping](#mapping), [Force](#force), [Impact](#impact), [Slide](#slide), and [Curves](#curves). |
 | **Emitter Prefab** | `AudioSource` template used by every pooled voice. Configure spatial audio and mixer routing on this prefab. |
 | **Maximum Voices** | Maximum number of pooled impact and slide voices that can play at once. |
 | **Minimum Impact Interval** | Minimum time in seconds between impact sounds from the same collider pair. |
@@ -40,52 +38,53 @@ Then:
 
 1. Open **Edit > Project Settings > Audio > Phys Sound**.
 2. Press **Create Settings**.
-3. Add the **Starter Pack 3D** or **Starter Pack 2D** sample, or configure your own surfaces and interactions.
+3. Import a package sample from the **Samples** tab in Package Manager, or configure your own surfaces and interactions.
 4. Choose a contact backend for Physics 3D.
 
-Settings and the pooled emitter prefab are created under `Assets/Resources/PhysSound`.
+The settings asset and `AudioSource` prefab are created under `Assets/Resources/PhysSound`.
 
-## Configuration
+## Step by Step Setup
+
+### Preview Tabs
 
 Select the settings asset or a `PhysSoundSubprofile` to use the editor at the bottom of the Inspector.
 
-### Materials
+#### Materials
 
-Create named surfaces and assign their `PhysicsMaterial` or `PhysicsMaterial2D` assets. Unmapped materials use the reserved `Default` surface.
+Create named surfaces and assign their `PhysicsMaterial` or `PhysicsMaterial2D`. Colliders with a null material or a material not added to **Materials** use `Default`.
 
 ![Materials tab](Documentation/Preview_Materials.png)
 
-### Mapping
+#### Mapping
 
-Map unordered surface pairs to interactions. Pair order does not matter.
+Map surface pairs to interactions.
 
-- `Default` is the reserved surface assigned to a collider whose Physics Material is missing or not mapped in **Materials**.
+- `Default` is used when a collider's Physics Material is null or not added to **Materials**.
 - `Any` is a wildcard. For example, `Metal + Any` matches Metal contacting any other surface.
-- **Default Interaction** is not a mapping row. It is the final fallback after exact and `Any` mappings.
 
 Resolution order is exact pair, either surface paired with `Any`, then **Default Interaction**. **Copy From** replaces the selected interaction with an independent copy of another interaction.
 
 ![Mapping tab](Documentation/Preview_Mapping.png)
 
-### Force
+#### Force
 
 Split the impact-force axis into ranges. An impact selects the range containing its impulse, then randomly chooses one marked region or clip from that range. The ▶ button auditions the selected range using its midpoint force.
 
 ![Force tab](Documentation/Preview_Force.png)
 
-### Impact
+#### Impact
 
-Add source clips for the selected force range and mark one or more waveform regions. At runtime, every marked region participates in random selection as a separate impact clip without requiring the source audio asset to be split manually. **Export** is supported and writes every marked region to a separate WAV file.
+Add source clips for the selected force range and mark one or more waveform regions. At runtime, every marked region participates in random selection as a separate impact clip without requiring the source audio to be split manually. **Export** is supported and writes every marked region to a separate WAV file.
 
 ![Impact tab](Documentation/Preview_Impact.png)
 
-### Slide
+#### Slide
 
 Assign a source clip and mark the single loop region used for continuous sliding. **Export** is supported and writes the marked region as a `Slide_Loop` WAV file.
 
 ![Slide tab](Documentation/Preview_Slide.png)
 
-### Preview playback
+#### Preview playback
 
 - The ▶ button beside an impact source plays a random marked region, or the full clip when it has no regions.
 - The ▶ button above a force range plays a random configured impact result from that range.
@@ -95,7 +94,7 @@ Assign a source clip and mark the single loop region used for continuous sliding
 
 Waveform editing supports zoom, pan, manual region marking, automatic region detection, and WAV export.
 
-### Curves
+#### Curves
 
 Choose **Impact** or **Slide**, then edit its **Volume** and **Pitch** response. Each curve always has two points: the left point is the response at the interaction's minimum impulse or slide speed, and the right point is the response at its maximum.
 
@@ -103,16 +102,11 @@ Drag vertically to change a point's Y value. Drag horizontally to change that po
 
 ![Curves tab](Documentation/Preview_Curves.png)
 
-## Physics 3D backends
-
-- **Provides Contacts**: enable Unity's **Provides Contacts** flag on participating colliders. No Phys Sound scene component is required.
-- **Components**: add `PhysSoundObject` to the root that receives collision callbacks, normally the `Rigidbody` GameObject.
-
-Physics 2D always uses `PhysSoundObject`. Enable **Force Disable Physics 2D** in the settings when the package should omit its 2D runtime code.
+Enable **Force Disable Physics 2D** in the settings when the package should omit its 2D runtime code.
 
 ## Audio and samples
 
-Configure mixer routing, spatial blend, rolloff, distance, Doppler, spread, priority, and reverb on the referenced emitter prefab.
+Configure mixer routing, spatial blend, rolloff, distance, Doppler, spread, priority, and reverb on the referenced `AudioSource` prefab.
 
 The package includes Example Scene and Starter Pack samples for both 3D and 2D.
 
