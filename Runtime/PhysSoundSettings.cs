@@ -201,7 +201,7 @@ namespace PhysSound
         private const int CurrentDataVersion = 4;
 
         [Header("Impact")]
-        [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
+        [SerializeField, HideInInspector] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
         [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0f, 1f)] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
         [SerializeField, PhysSoundLabel("Volume"), Min(0f)] private float _impactVolumeMultiplier = 1f;
         [SerializeField, PhysSoundMinMax(nameof(_maximumImpactImpulse), 0f, 20f, "Impulse")]
@@ -276,10 +276,12 @@ namespace PhysSound
 
         internal PhysSoundImpactRange CreateInitialImpactRange()
         {
+            AudioClip[] legacyClips = _impactClips;
+            _impactClips = Array.Empty<AudioClip>();
             PhysSoundImpactRange range = new PhysSoundImpactRange(
                 _minimumImpactImpulse,
                 _maximumImpactImpulse,
-                _impactClips);
+                legacyClips);
             _impactRanges.Add(range);
             range.MigrateLegacyClips();
             return range;
@@ -568,6 +570,7 @@ namespace PhysSound
         public const string ResourcePath = "PhysSound/PhysSoundSettings";
 
         [SerializeField] private PhysSoundContactBackend _contactBackend = PhysSoundContactBackend.ProvidesContacts;
+        [Tooltip("Overrides entries from Settings in array order. Later Subprofiles have higher priority.")]
         [SerializeField] private PhysSoundSubprofile[] _externalSubprofiles = Array.Empty<PhysSoundSubprofile>();
         [SerializeField] private Dictionary<string, PhysSoundSurface> _surfaces = new();
         [SerializeField] private PhysSoundInteraction _defaultInteraction = new();
@@ -595,6 +598,7 @@ namespace PhysSound
         internal float SlidePitchSpeed => Mathf.Max(0f, _slidePitchSpeed);
         internal float SlidePositionSpeed => Mathf.Max(0f, _slidePositionSpeed);
         internal PhysSoundInteraction DefaultInteraction => _defaultInteraction;
+        internal Dictionary<string, PhysSoundSurface> Surfaces => _surfaces;
         internal Dictionary<PhysSoundInteractionKey, PhysSoundInteraction> Interactions => _interactions;
         internal static PhysSoundSettings Load()
         {
@@ -618,6 +622,8 @@ namespace PhysSound
             interactionValues.Add(_defaultInteraction);
             interactions[new PhysSoundInteractionKey(DefaultSurface, AnySurface)] = 0;
 
+            AppendProfile(_surfaces, _interactions, surfaces, interactions, interactionValues);
+
             if (_externalSubprofiles != null)
             {
                 for (int i = 0; i < _externalSubprofiles.Length; i++)
@@ -635,14 +641,14 @@ namespace PhysSound
                     }
                 }
             }
-
-            AppendProfile(_surfaces, _interactions, surfaces, interactions, interactionValues);
         }
 
 #if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
         internal void BuildLookups2D(Dictionary<PhysicsMaterial2D, string> surfaces)
         {
             surfaces.Clear();
+
+            AppendProfile2D(_surfaces, surfaces);
 
             if (_externalSubprofiles != null)
             {
@@ -656,8 +662,6 @@ namespace PhysSound
                     }
                 }
             }
-
-            AppendProfile2D(_surfaces, surfaces);
         }
 #endif
 

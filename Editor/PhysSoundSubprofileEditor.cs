@@ -1,6 +1,8 @@
 #if PHYS_SOUND_AUDIO && PHYS_SOUND_3D
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace PhysSound.Editor
 {
@@ -9,45 +11,64 @@ namespace PhysSound.Editor
     {
         private readonly PhysSoundInteractivePreview _preview = new();
 
-        public override void OnInspectorGUI()
+        public override VisualElement CreateInspectorGUI()
         {
-            DrawDefaultInspector();
-            EditorGUILayout.Space();
+            VisualElement root = new();
+            InspectorElement.FillDefaultInspector(root, serializedObject, this);
+
+            VisualElement actions = new();
+            actions.style.marginTop = 4f;
+            root.Add(actions);
 
             PhysSoundSettings settings = AssetDatabase.LoadAssetAtPath<PhysSoundSettings>(
                 PhysSoundSettingsProvider.AssetPath);
 
             if (settings == null)
             {
-                EditorGUILayout.HelpBox(
+                actions.Add(new HelpBox(
                     "Create the Phys Sound project settings before adding this subprofile.",
-                    MessageType.Info);
-                return;
+                    HelpBoxMessageType.Info));
+                return root;
             }
 
             SerializedObject serializedSettings = new SerializedObject(settings);
             SerializedProperty subprofiles = serializedSettings.FindProperty("_externalSubprofiles");
 
-            if (Contains(subprofiles, target))
+            void RefreshActions()
             {
-                if (GUILayout.Button("Open Settings"))
+                serializedSettings.Update();
+                actions.Clear();
+                if (Contains(subprofiles, target))
                 {
-                    SettingsService.OpenProjectSettings(PhysSoundSettingsProvider.SettingsPath);
+                    actions.Add(CreateOpenSettingsButton(settings));
+                    return;
                 }
 
-                return;
+                Button addToSettings = new(() =>
+                {
+                    serializedSettings.Update();
+                    if (!Contains(subprofiles, target))
+                    {
+                        Undo.RecordObject(settings, "Add Phys Sound Subprofile");
+                        int index = subprofiles.arraySize;
+                        subprofiles.InsertArrayElementAtIndex(index);
+                        subprofiles.GetArrayElementAtIndex(index).objectReferenceValue = target;
+                        serializedSettings.ApplyModifiedProperties();
+                        EditorUtility.SetDirty(settings);
+                        AssetDatabase.SaveAssets();
+                    }
+
+                    RefreshActions();
+                })
+                {
+                    text = "Add to Settings"
+                };
+                actions.Add(addToSettings);
             }
 
-            if (GUILayout.Button("Add to Settings"))
-            {
-                Undo.RecordObject(settings, "Add Phys Sound Subprofile");
-                int index = subprofiles.arraySize;
-                subprofiles.InsertArrayElementAtIndex(index);
-                subprofiles.GetArrayElementAtIndex(index).objectReferenceValue = target;
-                serializedSettings.ApplyModifiedProperties();
-                EditorUtility.SetDirty(settings);
-                AssetDatabase.SaveAssets();
-            }
+            actions.TrackPropertyValue(subprofiles, _ => RefreshActions());
+            RefreshActions();
+            return root;
         }
 
         public override bool HasPreviewGUI()
@@ -57,17 +78,32 @@ namespace PhysSound.Editor
 
         public override GUIContent GetPreviewTitle()
         {
-            return new GUIContent("Phys Sound Audio Markup");
+            return new GUIContent("Phys Sound Editor");
         }
 
-        public override void OnInteractivePreviewGUI(Rect rect, GUIStyle background)
+        public override VisualElement CreatePreview(VisualElement inspectorPreviewWindow)
         {
-            _preview.Draw(rect, target);
+            inspectorPreviewWindow.Clear();
+            inspectorPreviewWindow.Add(_preview.CreateVisualElement(target));
+            return inspectorPreviewWindow;
         }
 
         private void OnDisable()
         {
-            PhysSoundInteractivePreview.Stop();
+            _preview.Dispose();
+        }
+
+        private static Button CreateOpenSettingsButton(PhysSoundSettings settings)
+        {
+            return new Button(() =>
+            {
+                SettingsService.OpenProjectSettings(PhysSoundSettingsProvider.SettingsPath);
+                Selection.activeObject = settings;
+                EditorGUIUtility.PingObject(settings);
+            })
+            {
+                text = "Open Settings"
+            };
         }
 
         private static bool Contains(SerializedProperty subprofiles, Object subprofile)

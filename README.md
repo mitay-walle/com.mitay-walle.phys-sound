@@ -69,10 +69,8 @@ Wood × Concrete == Concrete × Wood
 
 Each interaction can contain:
 
-- impact clips;
-- an impact impulse range, volume curve, multiplier and random pitch range;
-- looping slide clips;
-- a slide speed range, volume curve, multiplier and pitch range.
+- impact clips split across force ranges, with volume and pitch curves;
+- a looping slide clip, with speed-based volume and pitch curves.
 
 The **Default Interaction** is configured separately and is not an element of the interactions list.
 Leave **Surface B** empty on a listed interaction to use a wildcard. Resolution order is:
@@ -83,13 +81,39 @@ Leave **Surface B** empty on a listed interaction to use a wildcard. Resolution 
 
 ### External subprofiles
 
-The main settings can reference an ordered array of external `PhysSoundSubprofile` assets. Each subprofile can define surfaces and interactions for a reusable content set. Later subprofiles override earlier entries, and dictionaries authored directly in the main settings override all external subprofiles. The separate **Default Interaction** remains owned by the main settings.
+The main settings can reference an ordered array of external `PhysSoundSubprofile` assets. Each subprofile can define surfaces and interactions for a reusable content set. External subprofiles override entries authored directly in the main settings, and later subprofiles override earlier ones. The separate **Default Interaction** remains owned by the main settings.
 
 The package also includes separate `Starter Pack 3D` and `Starter Pack 2D` samples. Each starter pack contains a ready-to-use profile, sounds, and standalone Physics Material assets.
 
-### Interactive audio preview and markup
+### Interactive preview and markup
 
-Select the settings asset or any Phys Sound subprofile and open Unity's Preview panel at the bottom of the Inspector. Use **Slice Force** to split the nonlinear impact-force line into editable ranges, then use **Slice Impact Clips** to select every source clip in a scrollable list and mark its waveform. Each valid marked region becomes a random runtime impact variation and both preview buttons and runtime playback use those regions directly without creating sliced assets. **Slice Slide Clips** provides the corresponding loop workflow. The **Curves** step exposes simplified two-point volume and pitch curves for Impact and Slide: hover either half of the gradient viewport to select its endpoint, drag vertically to change its value, drag horizontally to rotate its tangent, or enter exact values in the side **Min** and **Max** fields. Use the mouse wheel to zoom around the cursor, middle-drag or Alt + left-drag to pan, and **Fit** to restore the full clip. **Auto Detect** replaces the current markup with detected regions; compact MinMaxSliders control the accepted sound/pause volume and duration ranges. Region edits support Unity Undo. **Export** remains available when standalone WAV AudioClips are useful.
+Select the settings asset or a Phys Sound subprofile and open the Preview panel at the bottom of the Inspector.
+
+**Materials** — edit named surfaces and assign their 3D or 2D Physics Materials.
+
+![Materials tab](Documentation/Preview_Materials.png)
+
+**Mapping** — map unordered surface pairs to interactions and copy values from existing pairs.
+
+![Mapping tab](Documentation/Preview_Mapping.png)
+
+**Force** — split the nonlinear impact-force axis into editable ranges and audition a range.
+
+![Force tab](Documentation/Preview_Force.png)
+
+**Impact** — mark and play waveform regions for every impact clip in the selected force range.
+
+![Impact tab](Documentation/Preview_Impact.png)
+
+**Slide** — choose a source clip and mark the loop region used for continuous sliding.
+
+![Slide tab](Documentation/Preview_Slide.png)
+
+**Curves** — adjust two-point volume and pitch response curves for Impact and Slide.
+
+![Curves tab](Documentation/Preview_Curves.png)
+
+Waveform tabs support Undo, zoom and pan, automatic region detection, test playback, and optional WAV export.
 
 ### Voice pool and spatial audio
 

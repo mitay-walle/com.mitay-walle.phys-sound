@@ -53,11 +53,7 @@ MonoBehaviour:
       _surfaceA: Basketball
       _surfaceB: Basketball
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 9bc87356f7f04bb42b4271318af097b3, type: 3}
-      - {fileID: 8300000, guid: bf307b9c75f4fbe4ba2033844e00a404, type: 3}
-      - {fileID: 8300000, guid: ac0d4093e69cb9345bbae466b3fd28e0, type: 3}
-      - {fileID: 8300000, guid: 2db54e929c546f14f955ac33f0828b1c, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -82,10 +78,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0.5
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -111,27 +131,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0.5
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0.5
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 9bc87356f7f04bb42b4271318af097b3, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 9bc87356f7f04bb42b4271318af097b3, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: bf307b9c75f4fbe4ba2033844e00a404, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: bf307b9c75f4fbe4ba2033844e00a404, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: ac0d4093e69cb9345bbae466b3fd28e0, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: ac0d4093e69cb9345bbae466b3fd28e0, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 2db54e929c546f14f955ac33f0828b1c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 2db54e929c546f14f955ac33f0828b1c, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Basketball
       _surfaceB: Brick
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
-      - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
-      - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
-      - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
-      - {fileID: 8300000, guid: 131075c47c88620468d4576f258ed77b, type: 3}
-      - {fileID: 8300000, guid: 51a186f8d20486e43adf6acb0264ddaa, type: 3}
-      - {fileID: 8300000, guid: f2eb6baf62f677d4ab0425785dcabb95, type: 3}
-      - {fileID: 8300000, guid: 77b40c4bd56330540a9800f06a1e3969, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -156,10 +214,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0.5
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -185,23 +267,81 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0.5
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0.5
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 131075c47c88620468d4576f258ed77b, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 131075c47c88620468d4576f258ed77b, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 51a186f8d20486e43adf6acb0264ddaa, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 51a186f8d20486e43adf6acb0264ddaa, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: f2eb6baf62f677d4ab0425785dcabb95, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: f2eb6baf62f677d4ab0425785dcabb95, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 77b40c4bd56330540a9800f06a1e3969, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 77b40c4bd56330540a9800f06a1e3969, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Basketball
       _surfaceB: Cloth
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 9bc87356f7f04bb42b4271318af097b3, type: 3}
-      - {fileID: 8300000, guid: bf307b9c75f4fbe4ba2033844e00a404, type: 3}
-      - {fileID: 8300000, guid: ac0d4093e69cb9345bbae466b3fd28e0, type: 3}
-      - {fileID: 8300000, guid: 2db54e929c546f14f955ac33f0828b1c, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -226,10 +366,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -255,27 +419,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 9bc87356f7f04bb42b4271318af097b3, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 9bc87356f7f04bb42b4271318af097b3, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: bf307b9c75f4fbe4ba2033844e00a404, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: bf307b9c75f4fbe4ba2033844e00a404, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: ac0d4093e69cb9345bbae466b3fd28e0, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: ac0d4093e69cb9345bbae466b3fd28e0, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 2db54e929c546f14f955ac33f0828b1c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 2db54e929c546f14f955ac33f0828b1c, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Basketball
       _surfaceB: Metal
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
-      - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
-      - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
-      - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
-      - {fileID: 8300000, guid: 55a89e38b9e469c438893e3ce2a3b5f2, type: 3}
-      - {fileID: 8300000, guid: 86d806ce183641548b5c5cfc3541320b, type: 3}
-      - {fileID: 8300000, guid: e80d49bc16452c54ea15517fb93654a0, type: 3}
-      - {fileID: 8300000, guid: 566711da5d8d49d4a85ab6794557ae37, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -300,10 +502,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0.5
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -329,27 +555,81 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0.5
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0.5
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 55a89e38b9e469c438893e3ce2a3b5f2, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 55a89e38b9e469c438893e3ce2a3b5f2, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 86d806ce183641548b5c5cfc3541320b, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 86d806ce183641548b5c5cfc3541320b, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: e80d49bc16452c54ea15517fb93654a0, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e80d49bc16452c54ea15517fb93654a0, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 566711da5d8d49d4a85ab6794557ae37, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 566711da5d8d49d4a85ab6794557ae37, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Basketball
       _surfaceB: Plastic
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
-      - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
-      - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
-      - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
-      - {fileID: 8300000, guid: 709ac75339cb2234a8797074d939729b, type: 3}
-      - {fileID: 8300000, guid: 3a10aee2ba115c74a8d57d38846a5d80, type: 3}
-      - {fileID: 8300000, guid: 6fdd63ec46b4f0d43a74b618996a08ad, type: 3}
-      - {fileID: 8300000, guid: 3c9ff671428efdf4dae96d19da4348fc, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -374,10 +654,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0.5
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 23e6990ed052d44448c45d8f322417f7, type: 3}
       _slideVolume:
@@ -404,23 +708,81 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0.5
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0.5
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 709ac75339cb2234a8797074d939729b, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 709ac75339cb2234a8797074d939729b, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 3a10aee2ba115c74a8d57d38846a5d80, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3a10aee2ba115c74a8d57d38846a5d80, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6fdd63ec46b4f0d43a74b618996a08ad, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6fdd63ec46b4f0d43a74b618996a08ad, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 3c9ff671428efdf4dae96d19da4348fc, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3c9ff671428efdf4dae96d19da4348fc, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Basketball
       _surfaceB: Rock
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
-      - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
-      - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
-      - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -445,10 +807,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0.5
       _maximumImpactImpulse: 12.5
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.5, y: 1.5}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.5
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.5
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -474,23 +860,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0.5
       _maximumSlideSpeed: 12.5
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0.5
+        _maximumImpulse: 12.5
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Basketball
       _surfaceB: Wood
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
-      - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
-      - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
-      - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -515,10 +943,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -544,23 +996,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e7f59654934b2f84a94ebdd75356b7a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12b3e241976e4146bddbc2c93eab4c9, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b1abe1d710998404a8d43766dedeae8d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 2360a3d8ecc858943a6e7b369d8e29d6, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Brick
       _surfaceB: Brick
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
-      - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
-      - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
-      - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -585,10 +1079,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -614,23 +1132,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Brick
       _surfaceB: Cloth
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 131075c47c88620468d4576f258ed77b, type: 3}
-      - {fileID: 8300000, guid: 51a186f8d20486e43adf6acb0264ddaa, type: 3}
-      - {fileID: 8300000, guid: f2eb6baf62f677d4ab0425785dcabb95, type: 3}
-      - {fileID: 8300000, guid: 77b40c4bd56330540a9800f06a1e3969, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -655,10 +1215,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -684,27 +1268,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 131075c47c88620468d4576f258ed77b, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 131075c47c88620468d4576f258ed77b, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 51a186f8d20486e43adf6acb0264ddaa, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 51a186f8d20486e43adf6acb0264ddaa, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: f2eb6baf62f677d4ab0425785dcabb95, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: f2eb6baf62f677d4ab0425785dcabb95, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 77b40c4bd56330540a9800f06a1e3969, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 77b40c4bd56330540a9800f06a1e3969, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Brick
       _surfaceB: Metal
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
-      - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
-      - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
-      - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
-      - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
-      - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
-      - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
-      - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -729,10 +1351,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 0a444900b78570c4da32813338b0c411, type: 3}
       _slideVolume:
@@ -759,28 +1405,81 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Brick
       _surfaceB: Plastic
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
-      - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
-      - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
-      - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
-      - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
-      - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
-      - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
-      - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
-      - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -805,10 +1504,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 233c7ae2c567af24cb1bf3efeb2a29ed, type: 3}
       _slideVolume:
@@ -835,27 +1558,85 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Brick
       _surfaceB: Rock
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
-      - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
-      - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
-      - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
-      - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
-      - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
-      - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
-      - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -880,10 +1661,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 12.5
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.5, y: 1.5}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.5
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.5
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -909,23 +1714,81 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 12.5
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 12.5
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Brick
       _surfaceB: Wood
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
-      - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
-      - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
-      - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -950,10 +1813,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -979,23 +1866,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5ee9ecf1824e22d40b3f7ab56a2ef205, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 501be857bd59e2f47aa39044bb52777d, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 11f99cb76d79aa84fb6fbfd3092a5e99, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 644099188f02416469e791c6d4dd754d, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Cloth
       _surfaceB: Metal
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 55a89e38b9e469c438893e3ce2a3b5f2, type: 3}
-      - {fileID: 8300000, guid: 86d806ce183641548b5c5cfc3541320b, type: 3}
-      - {fileID: 8300000, guid: e80d49bc16452c54ea15517fb93654a0, type: 3}
-      - {fileID: 8300000, guid: 566711da5d8d49d4a85ab6794557ae37, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1020,10 +1949,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 8
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.85, y: 1.15}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.85
+          inSlope: 0
+          outSlope: 0.29999995
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.15
+          inSlope: 0.29999995
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -1049,23 +2002,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 8
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 8
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 55a89e38b9e469c438893e3ce2a3b5f2, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 55a89e38b9e469c438893e3ce2a3b5f2, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 86d806ce183641548b5c5cfc3541320b, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 86d806ce183641548b5c5cfc3541320b, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: e80d49bc16452c54ea15517fb93654a0, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e80d49bc16452c54ea15517fb93654a0, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 566711da5d8d49d4a85ab6794557ae37, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 566711da5d8d49d4a85ab6794557ae37, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Cloth
       _surfaceB: Plastic
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 709ac75339cb2234a8797074d939729b, type: 3}
-      - {fileID: 8300000, guid: 3a10aee2ba115c74a8d57d38846a5d80, type: 3}
-      - {fileID: 8300000, guid: 6fdd63ec46b4f0d43a74b618996a08ad, type: 3}
-      - {fileID: 8300000, guid: 3c9ff671428efdf4dae96d19da4348fc, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1090,10 +2085,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 23e6990ed052d44448c45d8f322417f7, type: 3}
       _slideVolume:
@@ -1120,23 +2139,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 709ac75339cb2234a8797074d939729b, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 709ac75339cb2234a8797074d939729b, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 3a10aee2ba115c74a8d57d38846a5d80, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3a10aee2ba115c74a8d57d38846a5d80, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6fdd63ec46b4f0d43a74b618996a08ad, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6fdd63ec46b4f0d43a74b618996a08ad, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 3c9ff671428efdf4dae96d19da4348fc, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3c9ff671428efdf4dae96d19da4348fc, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Metal
       _surfaceB: Metal
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
-      - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
-      - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
-      - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1161,10 +2222,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 8
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.85, y: 1.15}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.85
+          inSlope: 0
+          outSlope: 0.29999995
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.15
+          inSlope: 0.29999995
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 0a444900b78570c4da32813338b0c411, type: 3}
       _slideVolume:
@@ -1191,28 +2276,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 8
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 8
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Metal
       _surfaceB: Plastic
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
-      - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
-      - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
-      - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
-      - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
-      - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
-      - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
-      - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
-      - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1237,10 +2359,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 0a444900b78570c4da32813338b0c411, type: 3}
       - {fileID: 8300000, guid: 233c7ae2c567af24cb1bf3efeb2a29ed, type: 3}
@@ -1268,27 +2414,85 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Metal
       _surfaceB: Rock
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
-      - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
-      - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
-      - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
-      - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
-      - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
-      - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
-      - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1313,10 +2517,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 12.5
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.5, y: 1.5}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.5
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.5
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 0a444900b78570c4da32813338b0c411, type: 3}
       _slideVolume:
@@ -1343,23 +2571,81 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 12.5
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 12.5
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Metal
       _surfaceB: Wood
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
-      - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
-      - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
-      - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1384,10 +2670,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 8
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.85, y: 1.15}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.85
+          inSlope: 0
+          outSlope: 0.29999995
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.15
+          inSlope: 0.29999995
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 0a444900b78570c4da32813338b0c411, type: 3}
       _slideVolume:
@@ -1414,24 +2724,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 8
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 8
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: a12225393af35124c8ac9c017b29ed41, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 970ec92c1f9f13041bf374ce00f2d03c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 344f22c715c324e4c9794b9378299920, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 5c8a453c5e6eee04bbc79a6d912c44c8, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Plastic
       _surfaceB: Plastic
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
-      - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
-      - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
-      - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
-      - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1456,10 +2807,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 233c7ae2c567af24cb1bf3efeb2a29ed, type: 3}
       _slideVolume:
@@ -1486,28 +2861,69 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Plastic
       _surfaceB: Rock
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
-      - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
-      - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
-      - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
-      - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
-      - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
-      - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
-      - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
-      - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1532,10 +2948,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 12.5
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.5, y: 1.5}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.5
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.5
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 233c7ae2c567af24cb1bf3efeb2a29ed, type: 3}
       _slideVolume:
@@ -1562,24 +3002,85 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 12.5
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 12.5
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Plastic
       _surfaceB: Wood
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
-      - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
-      - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
-      - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
-      - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1604,10 +3105,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 10
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.75, y: 1.25}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.75
+          inSlope: 0
+          outSlope: 0.5
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.25
+          inSlope: 0.5
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips:
       - {fileID: 8300000, guid: 233c7ae2c567af24cb1bf3efeb2a29ed, type: 3}
       _slideVolume:
@@ -1634,23 +3159,69 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 10
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 10
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6df8d2cdf7236bf458abf735dd4185c1, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: e83779558f33ef643a5933e5283aa626, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: b048aeefca6d63440a3e638ae72caa75, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 8e0d46c3d08c04640a15a873a113dc9c, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 6b171ff70f406cf40bf1f967a938b22c, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Rock
       _surfaceB: Rock
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
-      - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
-      - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
-      - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1675,10 +3246,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 2
       _maximumImpactImpulse: 12.5
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.5, y: 1.5}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.5
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.5
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -1704,23 +3299,65 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 2
       _maximumSlideSpeed: 12.5
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.99, y: 1.01}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.99
+          inSlope: 0
+          outSlope: 0.01999998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.01
+          inSlope: 0.01999998
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 2
+        _maximumImpulse: 12.5
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []
   - key:
       _surfaceA: Rock
       _surfaceB: Wood
     value:
-      _impactClips:
-      - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
-      - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
-      - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
-      - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _impactClips: []
       _impactVolume:
         serializedVersion: 2
         m_Curve:
@@ -1745,10 +3382,34 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _impactVolumeMultiplier: 1
       _minimumImpactImpulse: 0
       _maximumImpactImpulse: 12.5
-      _impactVolumeMultiplier: 1
       _impactPitchRange: {x: 0.5, y: 1.5}
+      _impactPitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.5
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.5
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _slideClips: []
       _slideVolume:
         serializedVersion: 2
@@ -1774,11 +3435,57 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+      _slideVolumeMultiplier: 1
       _minimumSlideSpeed: 0
       _maximumSlideSpeed: 12.5
-      _slideVolumeMultiplier: 1
       _slidePitchRange: {x: 0.95, y: 1.05}
+      _slidePitch:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.95
+          inSlope: 0
+          outSlope: 0.099999964
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1.05
+          inSlope: 0.099999964
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
       _impactSourceClip: {fileID: 0}
       _impactRegions: []
+      _impactRanges:
+      - _minimumImpulse: 0
+        _maximumImpulse: 12.5
+        _clips: []
+        _clipSources:
+        - _sourceClip: {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 3df23652adabb87428850eca4dc2c1b4, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: c800685764e843542bfb0022acbcb8a6, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: 0b45e708bcd6ff04780cdd6b2c3d233f, type: 3}
+        - _sourceClip: {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+          _regions: []
+          _runtimeClips:
+          - {fileID: 8300000, guid: f0fbb44141ed481429b305cbb74a28df, type: 3}
+      _dataVersion: 4
       _slideSourceClip: {fileID: 0}
       _slideRegions: []

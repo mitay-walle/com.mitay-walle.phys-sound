@@ -20,12 +20,12 @@
   "samples": [
     {
       "displayName": "Example Scene 3D",
-      "description": "",
+      "description": "A playable 3D demo with a ready-to-use profile, sounds, and Physics Material assets.",
       "path": "Samples~/ExampleScene3D"
     },
     {
       "displayName": "Example Scene 2D",
-      "description": "",
+      "description": "A playable 2D demo with a ready-to-use profile, sounds, and Physics Material 2D assets.",
       "path": "Samples~/ExampleScene2D"
     },
     {

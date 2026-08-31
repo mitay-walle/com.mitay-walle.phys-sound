@@ -2,8 +2,12 @@
 
 ## Unreleased
 
-- Added the guided `Slice Force`, `Slice Impact Clips`, and `Slice Slide Clips` workflow. Every impact force range now exposes each source clip separately for waveform markup and auditioning; marked impact regions play directly at runtime without exported slice assets, while export remains optional. Legacy clips and markup migrate into the new model.
+- Added the guided `Force`, `Impact`, and `Slide` workflow. Every impact force range exposes each source clip separately for waveform markup and auditioning; marked impact regions play directly at runtime without exported slice assets, while export remains optional.
+- Added `Materials` and `Mapping` steps for focused surface editing, interaction mapping, validation, and copy-from authoring.
 - Added scrollable impact source lists and a `Curves` step backed by a reusable two-point `AnimationCurve` drawer for volume and pitch. Each half of the gradient viewport controls one endpoint with live hover feedback; vertical dragging changes its value, horizontal dragging rotates its inner tangent, and side `Min`/`Max` fields provide exact entry.
+- Changed lookup precedence so external subprofiles override entries from the main settings, with later subprofiles overriding earlier ones.
+- Migrated all bundled sample profiles to the current impact-range and two-point-curve data model, and added descriptions for both example-scene samples.
+- Improved Preview layout stability, scrolling, row-level mapping errors, source-copy controls, and table contrast.
 
 All notable changes to this package are documented in this file.
 
