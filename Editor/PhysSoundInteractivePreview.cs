@@ -19,6 +19,7 @@ namespace PhysSound.Editor
         private const float MinimumRegionPixels = 3f;
         private const float MinimumVisibleFraction = 0.005f;
         private const float DetectionSliderExponent = 2f;
+        private const float ImpactAxisExponent = 2f;
 
         private static readonly Color WaveformColor = new(0.55f, 0.78f, 1f, 0.9f);
         private static readonly Color RegionColor = new(0.2f, 0.65f, 1f, 0.2f);
@@ -41,6 +42,8 @@ namespace PhysSound.Editor
         private readonly List<PreviewEntry> _entries = new();
         private int _selectedInteraction;
         private int _selectedRegion = -1;
+        private int _selectedImpactRange;
+        private int _dragImpactBoundary = -1;
         private PreviewMode _mode;
         private DragMode _dragMode;
         private float _dragStartTime;
@@ -77,6 +80,12 @@ namespace PhysSound.Editor
 
             Rect toolbarRect = TakeTop(ref rect, ToolbarHeight);
             DrawToolbar(toolbarRect);
+
+            if (_mode == PreviewMode.ImpactRanges)
+            {
+                DrawImpactRanges(rect, owner, entry.Interaction);
+                return;
+            }
 
             Rect clipRect = TakeTop(ref rect, ClipRowHeight);
             AudioClip clip = DrawClipField(clipRect, owner, entry.Interaction);
@@ -139,7 +148,7 @@ namespace PhysSound.Editor
 
         private void DrawToolbar(Rect rect)
         {
-            float modeWidth = Mathf.Min(150f, rect.width * 0.35f);
+            float modeWidth = Mathf.Min(330f, rect.width * 0.62f);
             Rect interactionRect = new(rect.x, rect.y, rect.width - modeWidth - Spacing, rect.height);
             Rect modeRect = new(interactionRect.xMax + Spacing, rect.y, modeWidth, rect.height);
 
@@ -150,7 +159,11 @@ namespace PhysSound.Editor
             }
 
             int selectedInteraction = EditorGUI.Popup(interactionRect, _selectedInteraction, names, EditorStyles.toolbarPopup);
-            int selectedMode = GUI.Toolbar(modeRect, (int)_mode, new[] { "Impact", "Slide" }, EditorStyles.toolbarButton);
+            int selectedMode = GUI.Toolbar(
+                modeRect,
+                (int)_mode,
+                new[] { "Impact Ranges", "Impact Audio", "Slide Audio" },
+                EditorStyles.toolbarButton);
 
             if (selectedInteraction != _selectedInteraction || selectedMode != (int)_mode)
             {
@@ -165,9 +178,27 @@ namespace PhysSound.Editor
 
         private AudioClip DrawClipField(Rect rect, Object owner, PhysSoundInteraction interaction)
         {
-            AudioClip current = _mode == PreviewMode.Impact
+            AudioClip current = _mode == PreviewMode.ImpactAudio
                 ? interaction.ImpactSourceClip
                 : interaction.SlideSourceClip;
+
+            if (_mode == PreviewMode.ImpactAudio && interaction.ImpactRanges.Count > 0)
+            {
+                float rangeWidth = Mathf.Min(150f, rect.width * 0.35f);
+                Rect rangeRect = new Rect(rect.x, rect.y, rangeWidth, rect.height);
+                rect.xMin = rangeRect.xMax + Spacing;
+                string[] names = new string[interaction.ImpactRanges.Count];
+                for (int i = 0; i < names.Length; i++)
+                {
+                    PhysSoundImpactRange range = interaction.ImpactRanges[i];
+                    names[i] = $"{range.MinimumImpulse:0.##}–{range.MaximumImpulse:0.##}";
+                }
+
+                _selectedImpactRange = EditorGUI.Popup(
+                    rangeRect,
+                    Mathf.Clamp(_selectedImpactRange, 0, names.Length - 1),
+                    names);
+            }
 
             EditorGUI.BeginChangeCheck();
             AudioClip selected = EditorGUI.ObjectField(rect, "Source", current, typeof(AudioClip), false) as AudioClip;
@@ -178,7 +209,7 @@ namespace PhysSound.Editor
             }
 
             Undo.RecordObject(owner, "Change Phys Sound Preview Source");
-            if (_mode == PreviewMode.Impact)
+            if (_mode == PreviewMode.ImpactAudio)
             {
                 interaction.ImpactSourceClip = selected;
                 interaction.ImpactRegions.Clear();
@@ -199,9 +230,181 @@ namespace PhysSound.Editor
 
         private List<PhysSoundAudioRegion> GetRegions(PhysSoundInteraction interaction)
         {
-            return _mode == PreviewMode.Impact
+            return _mode == PreviewMode.ImpactAudio
                 ? interaction.ImpactRegions
                 : interaction.SlideRegions;
+        }
+
+        private void DrawImpactRanges(Rect rect, Object owner, PhysSoundInteraction interaction)
+        {
+            List<PhysSoundImpactRange> ranges = interaction.ImpactRanges;
+            if (ranges.Count == 0)
+            {
+                Rect button = new Rect(rect.center.x - 90f, rect.center.y - 10f, 180f, 22f);
+                if (GUI.Button(button, "Create Impact Range"))
+                {
+                    Undo.RecordObject(owner, "Create Phys Sound Impact Range");
+                    interaction.CreateInitialImpactRange();
+                    _selectedImpactRange = 0;
+                    EditorUtility.SetDirty(owner);
+                }
+
+                return;
+            }
+
+            _selectedImpactRange = Mathf.Clamp(_selectedImpactRange, 0, ranges.Count - 1);
+            Rect controls = new Rect(rect.x, rect.yMax - 22f, rect.width, 22f);
+            Rect axis = new Rect(rect.x + 8f, rect.y + 28f, rect.width - 16f, Mathf.Max(54f, rect.height - 60f));
+            EditorGUI.DrawRect(axis, new Color(0.08f, 0.08f, 0.08f, 1f));
+
+            float axisMaximum = Mathf.Max(0.01f, interaction.MaximumImpactImpulse);
+            for (int i = 0; i < ranges.Count; i++)
+            {
+                PhysSoundImpactRange range = ranges[i];
+                float xMin = ImpulseToPosition(axis, range.MinimumImpulse, axisMaximum);
+                float xMax = ImpulseToPosition(axis, range.MaximumImpulse, axisMaximum);
+                Rect segment = Rect.MinMaxRect(xMin, axis.y + 24f, xMax, axis.yMax);
+                EditorGUI.DrawRect(
+                    segment,
+                    i == _selectedImpactRange ? SelectedRegionColor : RegionColor);
+                GUI.Box(segment, GUIContent.none);
+
+                Rect play = new Rect(Mathf.Clamp(segment.center.x - 11f, segment.x, segment.xMax - 22f), axis.y + 2f, 22f, 19f);
+                if (GUI.Button(play, "▶"))
+                {
+                    _selectedImpactRange = i;
+                    float testImpulse = (range.MinimumImpulse + range.MaximumImpulse) * 0.5f;
+                    AudioClip clip = interaction.GetImpactClip(testImpulse);
+                    if (clip != null)
+                    {
+                        Play(clip, 0f, clip.length);
+                    }
+                }
+
+                GUI.Label(
+                    new Rect(segment.x + 4f, segment.y + 3f, Mathf.Max(0f, segment.width - 8f), 18f),
+                    $"{range.MinimumImpulse:0.##}–{range.MaximumImpulse:0.##}",
+                    EditorStyles.miniLabel);
+
+                if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && segment.Contains(Event.current.mousePosition))
+                {
+                    _selectedImpactRange = i;
+                    Event.current.Use();
+                }
+            }
+
+            HandleImpactBoundaries(axis, owner, ranges, axisMaximum);
+
+            if (GUI.Button(new Rect(controls.x, controls.y, 70f, controls.height), "Split"))
+            {
+                SplitImpactRange(owner, ranges, axisMaximum);
+            }
+
+            using (new EditorGUI.DisabledScope(ranges.Count <= 1))
+            {
+                if (GUI.Button(new Rect(controls.x + 74f, controls.y, 70f, controls.height), "Delete"))
+                {
+                    DeleteImpactRange(owner, ranges);
+                }
+            }
+
+            GUI.Label(
+                new Rect(controls.x + 152f, controls.y, controls.width - 152f, controls.height),
+                $"Nonlinear impulse axis  0–{axisMaximum:0.##}",
+                EditorStyles.miniLabel);
+        }
+
+        private void HandleImpactBoundaries(
+            Rect axis,
+            Object owner,
+            List<PhysSoundImpactRange> ranges,
+            float axisMaximum)
+        {
+            Event current = Event.current;
+            for (int i = 0; i < ranges.Count - 1; i++)
+            {
+                float x = ImpulseToPosition(axis, ranges[i].MaximumImpulse, axisMaximum);
+                Rect handle = new Rect(x - 4f, axis.y + 20f, 8f, axis.height - 16f);
+                EditorGUI.DrawRect(handle, WaveformColor);
+                EditorGUIUtility.AddCursorRect(handle, MouseCursor.ResizeHorizontal);
+                if (current.type == EventType.MouseDown && current.button == 0 && handle.Contains(current.mousePosition))
+                {
+                    Undo.RecordObject(owner, "Edit Phys Sound Impact Ranges");
+                    _dragImpactBoundary = i;
+                    current.Use();
+                }
+            }
+
+            if (_dragImpactBoundary < 0 || _dragImpactBoundary >= ranges.Count - 1)
+            {
+                return;
+            }
+
+            if (current.type == EventType.MouseDrag)
+            {
+                PhysSoundImpactRange left = ranges[_dragImpactBoundary];
+                PhysSoundImpactRange right = ranges[_dragImpactBoundary + 1];
+                float value = PositionToImpulse(axis, current.mousePosition.x, axisMaximum);
+                value = Mathf.Clamp(value, left.MinimumImpulse + 0.001f, right.MaximumImpulse - 0.001f);
+                left.MaximumImpulse = value;
+                right.MinimumImpulse = value;
+                EditorUtility.SetDirty(owner);
+                current.Use();
+            }
+            else if (current.type == EventType.MouseUp)
+            {
+                _dragImpactBoundary = -1;
+                current.Use();
+            }
+        }
+
+        private void SplitImpactRange(Object owner, List<PhysSoundImpactRange> ranges, float axisMaximum)
+        {
+            PhysSoundImpactRange source = ranges[_selectedImpactRange];
+            float xMin = Mathf.Pow(Mathf.InverseLerp(0f, axisMaximum, source.MinimumImpulse), 1f / ImpactAxisExponent);
+            float xMax = Mathf.Pow(Mathf.InverseLerp(0f, axisMaximum, source.MaximumImpulse), 1f / ImpactAxisExponent);
+            float split = Mathf.Lerp(0f, axisMaximum, Mathf.Pow((xMin + xMax) * 0.5f, ImpactAxisExponent));
+            if (split <= source.MinimumImpulse || split >= source.MaximumImpulse)
+            {
+                return;
+            }
+
+            Undo.RecordObject(owner, "Split Phys Sound Impact Range");
+            float previousMaximum = source.MaximumImpulse;
+            source.MaximumImpulse = split;
+            ranges.Insert(_selectedImpactRange + 1, new PhysSoundImpactRange(split, previousMaximum));
+            _selectedImpactRange++;
+            EditorUtility.SetDirty(owner);
+        }
+
+        private void DeleteImpactRange(Object owner, List<PhysSoundImpactRange> ranges)
+        {
+            Undo.RecordObject(owner, "Delete Phys Sound Impact Range");
+            PhysSoundImpactRange removed = ranges[_selectedImpactRange];
+            if (_selectedImpactRange > 0)
+            {
+                ranges[_selectedImpactRange - 1].MaximumImpulse = removed.MaximumImpulse;
+            }
+            else
+            {
+                ranges[1].MinimumImpulse = removed.MinimumImpulse;
+            }
+
+            ranges.RemoveAt(_selectedImpactRange);
+            _selectedImpactRange = Mathf.Clamp(_selectedImpactRange - 1, 0, ranges.Count - 1);
+            EditorUtility.SetDirty(owner);
+        }
+
+        private static float ImpulseToPosition(Rect axis, float impulse, float maximum)
+        {
+            float normalized = Mathf.Pow(Mathf.InverseLerp(0f, maximum, impulse), 1f / ImpactAxisExponent);
+            return Mathf.Lerp(axis.x, axis.xMax, normalized);
+        }
+
+        private static float PositionToImpulse(Rect axis, float x, float maximum)
+        {
+            float normalized = Mathf.InverseLerp(axis.x, axis.xMax, x);
+            return Mathf.Lerp(0f, maximum, Mathf.Pow(normalized, ImpactAxisExponent));
         }
 
         private void DrawControls(
@@ -267,7 +470,13 @@ namespace PhysSound.Editor
                 Rect exportRect = new(authoringRow.xMax - 66f, authoringRow.y, 66f, authoringRow.height);
                 if (GUI.Button(exportRect, "Export"))
                 {
-                    PhysSoundAudioExporter.Export(owner, interaction, _mode == PreviewMode.Impact, clip, regions);
+                    PhysSoundAudioExporter.Export(
+                        owner,
+                        interaction,
+                        _mode == PreviewMode.ImpactAudio,
+                        _selectedImpactRange,
+                        clip,
+                        regions);
                 }
             }
 
@@ -359,7 +568,7 @@ namespace PhysSound.Editor
                     if (TimeToRect(rect, clip, start, end).width >= MinimumRegionPixels)
                     {
                         Undo.RecordObject(owner, "Add Phys Sound Audio Region");
-                        if (_mode == PreviewMode.Slide)
+                        if (_mode == PreviewMode.SlideAudio)
                         {
                             regions.Clear();
                         }
@@ -604,7 +813,7 @@ namespace PhysSound.Editor
             List<Vector2> detected = PhysSoundAudioRegionDetector.Detect(
                 GetWaveform(clip),
                 clip.length,
-                _mode == PreviewMode.Impact,
+                _mode == PreviewMode.ImpactAudio,
                 DecibelsToAmplitude(_soundVolumeMinDb),
                 DecibelsToAmplitude(_soundVolumeMaxDb),
                 DecibelsToAmplitude(_pauseVolumeMinDb),
@@ -778,8 +987,9 @@ namespace PhysSound.Editor
 
         private enum PreviewMode
         {
-            Impact,
-            Slide
+            ImpactRanges,
+            ImpactAudio,
+            SlideAudio
         }
 
         private enum DragMode

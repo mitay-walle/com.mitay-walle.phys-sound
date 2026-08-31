@@ -28,6 +28,26 @@ namespace PhysSound
     }
 
     [Serializable]
+    internal sealed class PhysSoundImpactRange
+    {
+        [SerializeField, Min(0f)] private float _minimumImpulse = 0.1f;
+        [SerializeField, Min(0f)] private float _maximumImpulse = 10f;
+        [SerializeField] private AudioClip[] _clips = Array.Empty<AudioClip>();
+
+        internal PhysSoundImpactRange(float minimumImpulse, float maximumImpulse, AudioClip[] clips = null)
+        {
+            _minimumImpulse = minimumImpulse;
+            _maximumImpulse = maximumImpulse;
+            _clips = clips ?? Array.Empty<AudioClip>();
+        }
+
+        internal float MinimumImpulse { get => _minimumImpulse; set => _minimumImpulse = Mathf.Max(0f, value); }
+        internal float MaximumImpulse { get => _maximumImpulse; set => _maximumImpulse = Mathf.Max(_minimumImpulse, value); }
+        internal AudioClip[] Clips { get => _clips; set => _clips = value ?? Array.Empty<AudioClip>(); }
+        internal bool Contains(float impulse) => impulse >= _minimumImpulse && impulse <= _maximumImpulse;
+    }
+
+    [Serializable]
     internal sealed class PhysSoundInteraction
     {
         [Header("Impact")]
@@ -50,18 +70,29 @@ namespace PhysSound
 
         [SerializeField, HideInInspector] private AudioClip _impactSourceClip;
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _impactRegions = new();
+        [SerializeField, HideInInspector] private List<PhysSoundImpactRange> _impactRanges = new();
         [SerializeField, HideInInspector] private AudioClip _slideSourceClip;
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _slideRegions = new();
 
         internal bool HasSlide => HasValidClip(_slideClips);
         internal AudioClip ImpactSourceClip { get => _impactSourceClip; set => _impactSourceClip = value; }
         internal List<PhysSoundAudioRegion> ImpactRegions => _impactRegions;
+        internal List<PhysSoundImpactRange> ImpactRanges => _impactRanges;
+        internal float MinimumImpactImpulse => _minimumImpactImpulse;
+        internal float MaximumImpactImpulse => _maximumImpactImpulse;
         internal AudioClip SlideSourceClip { get => _slideSourceClip; set => _slideSourceClip = value; }
         internal List<PhysSoundAudioRegion> SlideRegions => _slideRegions;
 
-        internal void SetExportedImpactClips(AudioClip[] clips)
+        internal void SetExportedImpactClips(AudioClip[] clips, int rangeIndex)
         {
-            _impactClips = clips ?? Array.Empty<AudioClip>();
+            if (rangeIndex >= 0 && rangeIndex < _impactRanges.Count)
+            {
+                _impactRanges[rangeIndex].Clips = clips;
+            }
+            else
+            {
+                _impactClips = clips ?? Array.Empty<AudioClip>();
+            }
         }
 
         internal void SetExportedSlideClips(AudioClip[] clips)
@@ -69,9 +100,33 @@ namespace PhysSound
             _slideClips = clips ?? Array.Empty<AudioClip>();
         }
 
-        internal AudioClip GetImpactClip()
+        internal AudioClip GetImpactClip(float impulse)
         {
-            return GetRandomClip(_impactClips);
+            if (_impactRanges.Count == 0)
+            {
+                return GetRandomClip(_impactClips);
+            }
+
+            for (int i = 0; i < _impactRanges.Count; i++)
+            {
+                PhysSoundImpactRange range = _impactRanges[i];
+                if (range != null && range.Contains(impulse))
+                {
+                    return GetRandomClip(range.Clips);
+                }
+            }
+
+            return null;
+        }
+
+        internal PhysSoundImpactRange CreateInitialImpactRange()
+        {
+            PhysSoundImpactRange range = new PhysSoundImpactRange(
+                _minimumImpactImpulse,
+                _maximumImpactImpulse,
+                _impactClips);
+            _impactRanges.Add(range);
+            return range;
         }
 
         internal AudioClip GetSlideClip()

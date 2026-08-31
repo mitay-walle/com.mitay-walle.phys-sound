@@ -416,7 +416,7 @@ namespace PhysSound
 			}
 
 			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
-			AudioClip clip = interaction.GetImpactClip();
+			AudioClip clip = interaction.GetImpactClip(impulse);
 			float volume = interaction.EvaluateImpactVolume(impulse);
 
 			if (clip == null || volume <= 0f)
