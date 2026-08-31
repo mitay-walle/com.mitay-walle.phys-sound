@@ -1,227 +1,91 @@
 # Phys Sound 2
 
-Phys Sound turns Unity 3D and 2D collision contacts into positioned impact and sliding audio.
+Phys Sound turns Unity 3D and 2D collision contacts into positioned impact and sliding audio. Version 2.0 is a breaking rewrite for Unity 6000.6.0a7 and newer, built around one settings asset and a bounded pool of native spatial `AudioSource` objects.
 
-Version 2.0 is a breaking rewrite for Unity 6000.6.0a7 and newer. It removes the legacy database, key, material, audio-container and temporary-audio-object workflow. Configuration lives in one Project Settings page, while playback uses one hidden bounded pool of native spatial `AudioSource` objects.
-
-Imported `AudioClip` assets implement Unity's `IAudioGenerator` API in Unity 6.5 and are assigned through `AudioSource.resource`. Unity continues to handle attenuation, spatialization, mixer routing, Doppler and reverb for every pooled emitter.
+![Phys Sound settings](Documentation/Screenshot_1.png)
 
 ## Requirements
 
 - Unity 6000.6.0a7 or newer
-- Unity Audio module
-- Unity Physics 3D module
-
-The package declares no mandatory UPM dependencies. Audio, Physics 3D, Physics 2D and Terrain are detected through assembly-definition version defines, as in Phys Sound 1.x. Physics 2D support is optional.
-
-Enable **Force Disable Physics 2D** in the Phys Sound settings to add the `PHYS_SOUND_DISABLE_2D` scripting define for the active build target. This removes Phys Sound's 2D runtime code without disabling Unity Physics 2D for the rest of the project. Serialized 2D material fields remain in the asset layout but are hidden in the Inspector, so switching the define does not discard their references.
+- Unity Audio and Physics 3D modules
+- Physics 2D module only for 2D contacts
 
 ## Installation
 
-Install the package from its Git URL in Unity Package Manager:
+Install the Git URL through Unity Package Manager:
 
 ```text
 https://github.com/mitay-walle/com.mitay-walle.phys-sound.git
 ```
 
-Then open:
+Then:
 
-```text
-Edit > Project Settings > Audio > Phys Sound
-```
+1. Open **Edit > Project Settings > Audio > Phys Sound**.
+2. Press **Create Settings**.
+3. Add the **Starter Pack 3D** or **Starter Pack 2D** sample, or configure your own surfaces and interactions.
+4. Choose a contact backend for Physics 3D.
 
-Press **Create Settings**. This explicit action creates the settings and emitter prefab at:
-
-```text
-Assets/Resources/PhysSound/PhysSoundSettings.asset
-Assets/Resources/PhysSound/PhysSoundAudioSource.prefab
-```
-
-The system never creates or modifies project assets, scenes, prefabs or collider settings automatically.
+Settings and the pooled emitter prefab are created under `Assets/Resources/PhysSound`. Phys Sound does not automatically modify scenes, prefabs, colliders, or Physics Materials.
 
 ## Configuration
 
-### Surfaces
+Select the settings asset or a `PhysSoundSubprofile` to use the editor at the bottom of the Inspector.
 
-The surfaces dictionary maps each stable surface name to one or more standard Unity `PhysicsMaterial` or `PhysicsMaterial2D` assets.
+### Materials
 
-Example:
-
-```text
-Wood
-  Wood
-  WoodSlippery
-
-Metal
-  Metal
-  MetalBouncy
-```
-
-A collider whose material is not mapped resolves to `Default`.
-
-### Interactions
-
-The interactions dictionary maps an unordered surface pair to its audio configuration:
-
-```text
-Wood × Concrete == Concrete × Wood
-```
-
-Each interaction can contain:
-
-- impact clips split across force ranges, with volume and pitch curves;
-- a looping slide clip, with speed-based volume and pitch curves.
-
-The **Default Interaction** is configured separately and is not an element of the interactions list.
-Leave **Surface B** empty on a listed interaction to use a wildcard. Resolution order is:
-
-1. exact pair;
-2. either concrete surface paired with an empty Surface B;
-3. the separate **Default Interaction**.
-
-### External subprofiles
-
-The main settings can reference an ordered array of external `PhysSoundSubprofile` assets. Each subprofile can define surfaces and interactions for a reusable content set. External subprofiles override entries authored directly in the main settings, and later subprofiles override earlier ones. The separate **Default Interaction** remains owned by the main settings.
-
-The package also includes separate `Starter Pack 3D` and `Starter Pack 2D` samples. Each starter pack contains a ready-to-use profile, sounds, and standalone Physics Material assets.
-
-### Interactive preview and markup
-
-Select the settings asset or a Phys Sound subprofile and open the Preview panel at the bottom of the Inspector.
-
-**Materials** — edit named surfaces and assign their 3D or 2D Physics Materials.
+Create named surfaces and assign their `PhysicsMaterial` or `PhysicsMaterial2D` assets. Unmapped materials use `Default`.
 
 ![Materials tab](Documentation/Preview_Materials.png)
 
-**Mapping** — map unordered surface pairs to interactions and copy values from existing pairs.
+### Mapping
+
+Map unordered surface pairs to interactions. Empty **Surface B** acts as a wildcard; the separate **Default Interaction** is the final fallback.
 
 ![Mapping tab](Documentation/Preview_Mapping.png)
 
-**Force** — split the nonlinear impact-force axis into editable ranges and audition a range.
+### Force
+
+Split the impact-force axis into ranges and audition each range.
 
 ![Force tab](Documentation/Preview_Force.png)
 
-**Impact** — mark and play waveform regions for every impact clip in the selected force range.
+### Impact
+
+Assign impact clips and mark the playable waveform region for the selected force range.
 
 ![Impact tab](Documentation/Preview_Impact.png)
 
-**Slide** — choose a source clip and mark the loop region used for continuous sliding.
+### Slide
+
+Assign a looping slide clip and mark its loop region.
 
 ![Slide tab](Documentation/Preview_Slide.png)
 
-**Curves** — adjust two-point volume and pitch response curves for Impact and Slide.
+### Curves
+
+Adjust volume and pitch response for impact and slide sounds.
 
 ![Curves tab](Documentation/Preview_Curves.png)
 
-Waveform tabs support Undo, zoom and pan, automatic region detection, test playback, and optional WAV export.
+Waveform tools include playback, Undo, zoom, pan, automatic region detection, and optional WAV export. External subprofiles are applied in order; later subprofiles override earlier ones.
 
-### Voice pool and spatial audio
+## Physics 3D backends
 
-The settings reference one `AudioSource` prefab. Configure mixer routing, spatial blend, rolloff, distance, Doppler, spread, priority, reverb and other source properties directly on that prefab.
+- **Provides Contacts**: enable Unity's **Provides Contacts** flag on participating colliders. No Phys Sound scene component is required.
+- **Components**: add `PhysSoundObject` to the root that receives collision callbacks, normally the `Rigidbody` GameObject.
 
-The same Project Settings page controls:
+Physics 2D always uses `PhysSoundObject`. Enable **Force Disable Physics 2D** in the settings when the package should omit its 2D runtime code.
 
-- maximum pooled voices;
-- impact cooldown per collider pair;
-- slide fade, pitch and position smoothing;
-- the emitter prefab used by every pooled voice.
+## Audio and samples
 
-Impact and slide sounds use separate pooled emitters when their contact positions differ. No `AudioSource` is added to gameplay prefabs.
+Configure mixer routing, spatial blend, rolloff, distance, Doppler, spread, priority, and reverb on the referenced emitter prefab. Pool size, impact cooldown, and slide smoothing are configured in the Phys Sound settings.
 
-## Contact backends
+The package includes Example Scene and Starter Pack samples for both 3D and 2D.
 
-The **Contact Backend** setting selects one of two mutually exclusive Unity Physics 3D authoring workflows. Physics 2D always uses `PhysSoundObject` collision callbacks because `Physics2D` has no global equivalent of `Physics.ContactEvent`.
+## Migrating from 1.x
 
-### Provides Contacts
+Phys Sound 2.0 is not API-compatible with 1.x. Reconfigure existing content through **Project Settings > Audio > Phys Sound**. The old `PhysSoundObject` script GUID is retained so existing components do not become missing scripts.
 
-This is the componentless workflow.
+## License
 
-Enable the standard **Provides Contacts** flag manually on every collider that should opt into Phys Sound. A collision is processed when at least one collider in the pair has the flag enabled.
-
-Phys Sound:
-
-- subscribes to `Physics.ContactEvent`;
-- explicitly filters out pairs where neither collider has opted in;
-- never scans scenes or prefabs;
-- never changes `Collider.providesContacts`;
-- does not provide a bulk toggle command.
-
-This mode is useful when you want no Phys Sound components in scenes and prefer Unity's centralized contact stream.
-
-### Components
-
-Add `PhysSoundObject` to the root that receives collision callbacks, normally the same GameObject as the `Rigidbody`.
-
-`PhysSoundObject` permanently declares only `OnCollisionEnter`. It does not declare `OnCollisionStay`.
-
-When an entered surface interaction contains slide audio, Phys Sound adds one hidden runtime-only continuous-contact receiver to that object. The receiver exists only while at least one slide-capable contact is active and is destroyed after the last such contact exits. Impact-only objects therefore do not pay for continuous callbacks.
-
-If both colliding objects contain `PhysSoundObject`, the runtime deduplicates the impact and assigns continuous tracking to one side.
-
-`Collider.providesContacts` is ignored by this backend.
-
-### Physics 2D components
-
-Add `PhysSoundObject` to a GameObject that receives `OnCollisionEnter2D`, `OnCollisionStay2D` and `OnCollisionExit2D`. The same component supports both physics backends, and the runtime deduplicates pairs when both colliders contain it. The 3D **Contact Backend** selection does not affect this path.
-
-## Runtime layout
-
-Visible project entities:
-
-```text
-Project Settings > Audio > Phys Sound
-PhysSoundObject only in Components mode
-PhysSoundObject for Physics 2D contacts
-standard PhysicsMaterial assets
-standard PhysicsMaterial2D assets
-standard Collider.providesContacts only in Provides Contacts mode
-```
-
-Runtime-only implementation details:
-
-```text
-one hidden persistent host
-one bounded pool of hidden AudioSources
-one persistent slide emitter per active collider pair
-one-shot impact emitters from the same pool
-a lazy hidden continuous receiver in Components mode
-```
-
-## Migration from 1.x
-
-Phys Sound 2.0 is not API-compatible with 1.x.
-
-Removed concepts include:
-
-- `PhysSoundDatabase`;
-- `PhysSoundKey`;
-- `PhysSoundMaterial`;
-- `PhysSoundAudioSet`;
-- `PhysSoundAudioContainer`;
-- manually configured impact and slide `AudioSource` components;
-- the legacy temporary-audio pool;
-- the legacy Physics 2D architecture and Terrain composition implementation.
-
-Existing 1.x scenes and prefabs must be reconfigured through **Project Settings > Audio > Phys Sound**. The old `PhysSoundObject` script GUID is retained so existing components resolve to the new lightweight component instead of becoming missing scripts.
-
-## Current scope
-
-Phys Sound 2.0 currently supports:
-
-- Unity Physics 3D collision impacts;
-- Unity Physics 2D collision impacts through `PhysSoundObject`;
-- continuous sliding;
-- compound colliders through the actual contact colliders;
-- `Rigidbody` and `ArticulationBody` velocities through Unity contact data;
-- native Unity 3D audio and mixer routing.
-
-Not yet ported:
-
-- Terrain splat-layer composition;
-- trigger sounds;
-- rolling-specific audio;
-- triggers and rolling-specific audio.
-
-## License and origin
-
-Phys Sound is distributed under the MIT License. The original PhysSound system was developed by Kevin Somers (`crazymonkey`). This repository's 2.0 line is a new implementation and retains the original license notice.
+Phys Sound is distributed under the MIT License. The original PhysSound system was developed by Kevin Somers (`crazymonkey`).
