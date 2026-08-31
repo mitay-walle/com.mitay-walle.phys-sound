@@ -43,6 +43,7 @@ namespace PhysSound.Editor
         private int _selectedInteraction;
         private int _selectedRegion = -1;
         private int _selectedImpactRange;
+        private int _selectedImpactSource;
         private int _dragImpactBoundary = -1;
         private PreviewMode _mode;
         private DragMode _dragMode;
@@ -87,6 +88,12 @@ namespace PhysSound.Editor
                 return;
             }
 
+            if (_mode == PreviewMode.ImpactAudio)
+            {
+                DrawImpactAudio(rect, owner, entry.Interaction);
+                return;
+            }
+
             Rect clipRect = TakeTop(ref rect, ClipRowHeight);
             AudioClip clip = DrawClipField(clipRect, owner, entry.Interaction);
             rect.yMin += Spacing;
@@ -104,7 +111,7 @@ namespace PhysSound.Editor
             DrawWaveform(rect, clip);
             DrawRegions(rect, clip, regions);
             HandleWaveformInput(rect, clip, owner, regions);
-            DrawControls(controlsRect, owner, entry.Interaction, clip, regions);
+            DrawControls(controlsRect, owner, entry.Interaction, clip, regions, -1);
         }
 
         internal static void Stop()
@@ -162,7 +169,7 @@ namespace PhysSound.Editor
             int selectedMode = GUI.Toolbar(
                 modeRect,
                 (int)_mode,
-                new[] { "Impact Ranges", "Impact Audio", "Slide Audio" },
+                new[] { "Slice Force", "Slice Impact Clips", "Slice Slide Clips" },
                 EditorStyles.toolbarButton);
 
             if (selectedInteraction != _selectedInteraction || selectedMode != (int)_mode)
@@ -178,27 +185,7 @@ namespace PhysSound.Editor
 
         private AudioClip DrawClipField(Rect rect, Object owner, PhysSoundInteraction interaction)
         {
-            AudioClip current = _mode == PreviewMode.ImpactAudio
-                ? interaction.ImpactSourceClip
-                : interaction.SlideSourceClip;
-
-            if (_mode == PreviewMode.ImpactAudio && interaction.ImpactRanges.Count > 0)
-            {
-                float rangeWidth = Mathf.Min(150f, rect.width * 0.35f);
-                Rect rangeRect = new Rect(rect.x, rect.y, rangeWidth, rect.height);
-                rect.xMin = rangeRect.xMax + Spacing;
-                string[] names = new string[interaction.ImpactRanges.Count];
-                for (int i = 0; i < names.Length; i++)
-                {
-                    PhysSoundImpactRange range = interaction.ImpactRanges[i];
-                    names[i] = $"{range.MinimumImpulse:0.##}–{range.MaximumImpulse:0.##}";
-                }
-
-                _selectedImpactRange = EditorGUI.Popup(
-                    rangeRect,
-                    Mathf.Clamp(_selectedImpactRange, 0, names.Length - 1),
-                    names);
-            }
+            AudioClip current = interaction.SlideSourceClip;
 
             EditorGUI.BeginChangeCheck();
             AudioClip selected = EditorGUI.ObjectField(rect, "Source", current, typeof(AudioClip), false) as AudioClip;
@@ -209,16 +196,8 @@ namespace PhysSound.Editor
             }
 
             Undo.RecordObject(owner, "Change Phys Sound Preview Source");
-            if (_mode == PreviewMode.ImpactAudio)
-            {
-                interaction.ImpactSourceClip = selected;
-                interaction.ImpactRegions.Clear();
-            }
-            else
-            {
-                interaction.SlideSourceClip = selected;
-                interaction.SlideRegions.Clear();
-            }
+            interaction.SlideSourceClip = selected;
+            interaction.SlideRegions.Clear();
 
             EditorUtility.SetDirty(owner);
             Stop();
@@ -230,9 +209,124 @@ namespace PhysSound.Editor
 
         private List<PhysSoundAudioRegion> GetRegions(PhysSoundInteraction interaction)
         {
-            return _mode == PreviewMode.ImpactAudio
-                ? interaction.ImpactRegions
-                : interaction.SlideRegions;
+            return interaction.SlideRegions;
+        }
+
+        private void DrawImpactAudio(Rect rect, Object owner, PhysSoundInteraction interaction)
+        {
+            List<PhysSoundImpactRange> ranges = interaction.ImpactRanges;
+            if (ranges.Count == 0)
+            {
+                EditorGUI.HelpBox(rect, "Create a force range in Slice Force first.", MessageType.Info);
+                return;
+            }
+
+            _selectedImpactRange = Mathf.Clamp(_selectedImpactRange, 0, ranges.Count - 1);
+            Rect rangeRow = TakeTop(ref rect, ClipRowHeight);
+            string[] rangeNames = new string[ranges.Count];
+            for (int i = 0; i < ranges.Count; i++)
+            {
+                rangeNames[i] = $"{ranges[i].MinimumImpulse:0.##}–{ranges[i].MaximumImpulse:0.##}";
+            }
+
+            int selectedRange = EditorGUI.Popup(rangeRow, "Force Range", _selectedImpactRange, rangeNames);
+            if (selectedRange != _selectedImpactRange)
+            {
+                Stop();
+                _selectedImpactRange = selectedRange;
+                _selectedImpactSource = 0;
+                _selectedRegion = -1;
+                ResetView();
+            }
+
+            PhysSoundImpactRange range = ranges[_selectedImpactRange];
+            List<PhysSoundImpactClipSource> sources = range.ClipSources;
+            float listWidth = Mathf.Min(190f, rect.width * 0.32f);
+            Rect listRect = new Rect(rect.x, rect.y, listWidth, rect.height);
+            Rect workspace = new Rect(listRect.xMax + Spacing, rect.y, rect.width - listWidth - Spacing, rect.height);
+            DrawImpactSourceList(listRect, owner, sources);
+
+            if (sources.Count == 0)
+            {
+                EditorGUI.HelpBox(workspace, "Add an Impact AudioClip to mark it on the waveform.", MessageType.Info);
+                return;
+            }
+
+            _selectedImpactSource = Mathf.Clamp(_selectedImpactSource, 0, sources.Count - 1);
+            PhysSoundImpactClipSource source = sources[_selectedImpactSource];
+            Rect sourceRow = TakeTop(ref workspace, ClipRowHeight);
+            EditorGUI.BeginChangeCheck();
+            AudioClip selected = EditorGUI.ObjectField(sourceRow, "Clip", source.SourceClip, typeof(AudioClip), false) as AudioClip;
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(owner, "Change Phys Sound Impact Clip");
+                source.SourceClip = selected;
+                source.Regions.Clear();
+                source.RuntimeClips = selected == null ? Array.Empty<AudioClip>() : new[] { selected };
+                EditorUtility.SetDirty(owner);
+                _selectedRegion = -1;
+                ResetView();
+            }
+
+            if (selected == null)
+            {
+                EditorGUI.HelpBox(workspace, "Assign an AudioClip.", MessageType.Info);
+                return;
+            }
+
+            Rect controls = new Rect(workspace.x, workspace.yMax - ControlsHeight, workspace.width, ControlsHeight);
+            workspace.yMax = controls.y - Spacing;
+            DrawWaveform(workspace, selected);
+            DrawRegions(workspace, selected, source.Regions);
+            HandleWaveformInput(workspace, selected, owner, source.Regions);
+            DrawControls(controls, owner, interaction, selected, source.Regions, _selectedImpactSource);
+        }
+
+        private void DrawImpactSourceList(Rect rect, Object owner, List<PhysSoundImpactClipSource> sources)
+        {
+            GUI.Box(rect, GUIContent.none);
+            float y = rect.y + 3f;
+            for (int i = 0; i < sources.Count && y + 20f < rect.yMax - 25f; i++)
+            {
+                PhysSoundImpactClipSource source = sources[i];
+                Rect row = new Rect(rect.x + 3f, y, rect.width - 29f, 20f);
+                Rect play = new Rect(row.xMax + 2f, y, 21f, 20f);
+                string name = source.SourceClip == null ? "None" : source.SourceClip.name;
+                if (GUI.Toggle(row, i == _selectedImpactSource, name, EditorStyles.miniButton) && i != _selectedImpactSource)
+                {
+                    Stop();
+                    _selectedImpactSource = i;
+                    _selectedRegion = -1;
+                    ResetView();
+                }
+
+                if (GUI.Button(play, "▶") && source.SourceClip != null)
+                {
+                    Play(source.SourceClip, 0f, source.SourceClip.length);
+                }
+
+                y += 22f;
+            }
+
+            Rect add = new Rect(rect.x + 3f, rect.yMax - 22f, 45f, 19f);
+            if (GUI.Button(add, "+"))
+            {
+                Undo.RecordObject(owner, "Add Phys Sound Impact Clip");
+                sources.Add(new PhysSoundImpactClipSource(null));
+                _selectedImpactSource = sources.Count - 1;
+                EditorUtility.SetDirty(owner);
+            }
+
+            using (new EditorGUI.DisabledScope(sources.Count == 0))
+            {
+                if (GUI.Button(new Rect(add.xMax + 3f, add.y, 45f, add.height), "−"))
+                {
+                    Undo.RecordObject(owner, "Remove Phys Sound Impact Clip");
+                    sources.RemoveAt(Mathf.Clamp(_selectedImpactSource, 0, sources.Count - 1));
+                    _selectedImpactSource = Mathf.Clamp(_selectedImpactSource - 1, 0, Mathf.Max(0, sources.Count - 1));
+                    EditorUtility.SetDirty(owner);
+                }
+            }
         }
 
         private void DrawImpactRanges(Rect rect, Object owner, PhysSoundInteraction interaction)
@@ -257,7 +351,12 @@ namespace PhysSound.Editor
             Rect axis = new Rect(rect.x + 8f, rect.y + 28f, rect.width - 16f, Mathf.Max(54f, rect.height - 60f));
             EditorGUI.DrawRect(axis, new Color(0.08f, 0.08f, 0.08f, 1f));
 
-            float axisMaximum = Mathf.Max(0.01f, interaction.MaximumImpactImpulse);
+            float axisMaximum = 20f;
+            for (int i = 0; i < ranges.Count; i++)
+            {
+                axisMaximum = Mathf.Max(axisMaximum, ranges[i].MaximumImpulse);
+            }
+
             for (int i = 0; i < ranges.Count; i++)
             {
                 PhysSoundImpactRange range = ranges[i];
@@ -274,10 +373,9 @@ namespace PhysSound.Editor
                 {
                     _selectedImpactRange = i;
                     float testImpulse = (range.MinimumImpulse + range.MaximumImpulse) * 0.5f;
-                    AudioClip clip = interaction.GetImpactClip(testImpulse);
-                    if (clip != null)
+                    if (interaction.TryGetImpactPlayback(testImpulse, out PhysSoundImpactPlayback playback))
                     {
-                        Play(clip, 0f, clip.length);
+                        Play(playback.Clip, playback.StartTime, playback.EndTime);
                     }
                 }
 
@@ -289,7 +387,6 @@ namespace PhysSound.Editor
                 if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && segment.Contains(Event.current.mousePosition))
                 {
                     _selectedImpactRange = i;
-                    Event.current.Use();
                 }
             }
 
@@ -308,10 +405,11 @@ namespace PhysSound.Editor
                 }
             }
 
-            GUI.Label(
+            DrawSelectedImpactRangeFields(
                 new Rect(controls.x + 152f, controls.y, controls.width - 152f, controls.height),
-                $"Nonlinear impulse axis  0–{axisMaximum:0.##}",
-                EditorStyles.miniLabel);
+                owner,
+                ranges,
+                axisMaximum);
         }
 
         private void HandleImpactBoundaries(
@@ -321,9 +419,12 @@ namespace PhysSound.Editor
             float axisMaximum)
         {
             Event current = Event.current;
-            for (int i = 0; i < ranges.Count - 1; i++)
+            for (int i = 0; i <= ranges.Count; i++)
             {
-                float x = ImpulseToPosition(axis, ranges[i].MaximumImpulse, axisMaximum);
+                float value = i == 0
+                    ? ranges[0].MinimumImpulse
+                    : ranges[i - 1].MaximumImpulse;
+                float x = ImpulseToPosition(axis, value, axisMaximum);
                 Rect handle = new Rect(x - 4f, axis.y + 20f, 8f, axis.height - 16f);
                 EditorGUI.DrawRect(handle, WaveformColor);
                 EditorGUIUtility.AddCursorRect(handle, MouseCursor.ResizeHorizontal);
@@ -331,23 +432,20 @@ namespace PhysSound.Editor
                 {
                     Undo.RecordObject(owner, "Edit Phys Sound Impact Ranges");
                     _dragImpactBoundary = i;
+                    _selectedImpactRange = Mathf.Clamp(i, 0, ranges.Count - 1);
                     current.Use();
                 }
             }
 
-            if (_dragImpactBoundary < 0 || _dragImpactBoundary >= ranges.Count - 1)
+            if (_dragImpactBoundary < 0 || _dragImpactBoundary > ranges.Count)
             {
                 return;
             }
 
             if (current.type == EventType.MouseDrag)
             {
-                PhysSoundImpactRange left = ranges[_dragImpactBoundary];
-                PhysSoundImpactRange right = ranges[_dragImpactBoundary + 1];
                 float value = PositionToImpulse(axis, current.mousePosition.x, axisMaximum);
-                value = Mathf.Clamp(value, left.MinimumImpulse + 0.001f, right.MaximumImpulse - 0.001f);
-                left.MaximumImpulse = value;
-                right.MinimumImpulse = value;
+                SetImpactBoundary(ranges, _dragImpactBoundary, value, axisMaximum);
                 EditorUtility.SetDirty(owner);
                 current.Use();
             }
@@ -356,6 +454,64 @@ namespace PhysSound.Editor
                 _dragImpactBoundary = -1;
                 current.Use();
             }
+        }
+
+        private void DrawSelectedImpactRangeFields(
+            Rect rect,
+            Object owner,
+            List<PhysSoundImpactRange> ranges,
+            float axisMaximum)
+        {
+            int selected = Mathf.Clamp(_selectedImpactRange, 0, ranges.Count - 1);
+            PhysSoundImpactRange range = ranges[selected];
+            float spacing = 4f;
+            float width = (rect.width - spacing) * 0.5f;
+            Rect minimumRect = new Rect(rect.x, rect.y, width, rect.height);
+            Rect maximumRect = new Rect(minimumRect.xMax + spacing, rect.y, width, rect.height);
+
+            float previousLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 28f;
+            EditorGUI.BeginChangeCheck();
+            float minimum = EditorGUI.FloatField(minimumRect, "Min", range.MinimumImpulse);
+            float maximum = EditorGUI.FloatField(maximumRect, "Max", range.MaximumImpulse);
+            bool changed = EditorGUI.EndChangeCheck();
+            EditorGUIUtility.labelWidth = previousLabelWidth;
+
+            if (!changed)
+            {
+                return;
+            }
+
+            Undo.RecordObject(owner, "Edit Phys Sound Impact Range");
+            SetImpactBoundary(ranges, selected, minimum, axisMaximum);
+            SetImpactBoundary(ranges, selected + 1, maximum, axisMaximum);
+            EditorUtility.SetDirty(owner);
+        }
+
+        private static void SetImpactBoundary(
+            List<PhysSoundImpactRange> ranges,
+            int boundary,
+            float value,
+            float axisMaximum)
+        {
+            if (boundary == 0)
+            {
+                ranges[0].MinimumImpulse = Mathf.Clamp(value, 0f, ranges[0].MaximumImpulse - 0.001f);
+                return;
+            }
+
+            if (boundary == ranges.Count)
+            {
+                PhysSoundImpactRange last = ranges[ranges.Count - 1];
+                last.MaximumImpulse = Mathf.Clamp(value, last.MinimumImpulse + 0.001f, axisMaximum);
+                return;
+            }
+
+            PhysSoundImpactRange left = ranges[boundary - 1];
+            PhysSoundImpactRange right = ranges[boundary];
+            value = Mathf.Clamp(value, left.MinimumImpulse + 0.001f, right.MaximumImpulse - 0.001f);
+            left.MaximumImpulse = value;
+            right.MinimumImpulse = value;
         }
 
         private void SplitImpactRange(Object owner, List<PhysSoundImpactRange> ranges, float axisMaximum)
@@ -412,7 +568,8 @@ namespace PhysSound.Editor
             Object owner,
             PhysSoundInteraction interaction,
             AudioClip clip,
-            List<PhysSoundAudioRegion> regions)
+            List<PhysSoundAudioRegion> regions,
+            int impactSourceIndex)
         {
             Rect playbackRow = new(rect.x, rect.y, rect.width, 20f);
             Rect authoringRow = new(rect.x, playbackRow.yMax + Spacing, rect.width, 20f);
@@ -475,6 +632,7 @@ namespace PhysSound.Editor
                         interaction,
                         _mode == PreviewMode.ImpactAudio,
                         _selectedImpactRange,
+                        impactSourceIndex,
                         clip,
                         regions);
                 }

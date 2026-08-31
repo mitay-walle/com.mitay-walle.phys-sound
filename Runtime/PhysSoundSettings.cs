@@ -28,11 +28,44 @@ namespace PhysSound
     }
 
     [Serializable]
+    internal sealed class PhysSoundImpactClipSource
+    {
+        [SerializeField] private AudioClip _sourceClip;
+        [SerializeField] private List<PhysSoundAudioRegion> _regions = new();
+        [SerializeField] private AudioClip[] _runtimeClips = Array.Empty<AudioClip>();
+
+        internal PhysSoundImpactClipSource(AudioClip sourceClip, AudioClip[] runtimeClips = null)
+        {
+            _sourceClip = sourceClip;
+            _runtimeClips = runtimeClips ?? Array.Empty<AudioClip>();
+        }
+
+        internal AudioClip SourceClip { get => _sourceClip; set => _sourceClip = value; }
+        internal List<PhysSoundAudioRegion> Regions => _regions;
+        internal AudioClip[] RuntimeClips { get => _runtimeClips; set => _runtimeClips = value ?? Array.Empty<AudioClip>(); }
+    }
+
+    internal readonly struct PhysSoundImpactPlayback
+    {
+        internal PhysSoundImpactPlayback(AudioClip clip, float startTime, float endTime)
+        {
+            Clip = clip;
+            StartTime = startTime;
+            EndTime = endTime;
+        }
+
+        internal AudioClip Clip { get; }
+        internal float StartTime { get; }
+        internal float EndTime { get; }
+    }
+
+    [Serializable]
     internal sealed class PhysSoundImpactRange
     {
         [SerializeField, Min(0f)] private float _minimumImpulse = 0.1f;
         [SerializeField, Min(0f)] private float _maximumImpulse = 10f;
         [SerializeField] private AudioClip[] _clips = Array.Empty<AudioClip>();
+        [SerializeField, HideInInspector] private List<PhysSoundImpactClipSource> _clipSources = new();
 
         internal PhysSoundImpactRange(float minimumImpulse, float maximumImpulse, AudioClip[] clips = null)
         {
@@ -44,13 +77,128 @@ namespace PhysSound
         internal float MinimumImpulse { get => _minimumImpulse; set => _minimumImpulse = Mathf.Max(0f, value); }
         internal float MaximumImpulse { get => _maximumImpulse; set => _maximumImpulse = Mathf.Max(_minimumImpulse, value); }
         internal AudioClip[] Clips { get => _clips; set => _clips = value ?? Array.Empty<AudioClip>(); }
+        internal List<PhysSoundImpactClipSource> ClipSources => _clipSources;
         internal bool Contains(float impulse) => impulse >= _minimumImpulse && impulse <= _maximumImpulse;
+
+        internal void MigrateLegacyClips()
+        {
+            _clipSources ??= new List<PhysSoundImpactClipSource>();
+            if (_clipSources.Count == 0 && _clips != null)
+            {
+                for (int i = 0; i < _clips.Length; i++)
+                {
+                    AudioClip clip = _clips[i];
+                    if (clip != null)
+                    {
+                        _clipSources.Add(new PhysSoundImpactClipSource(clip, new[] { clip }));
+                    }
+                }
+            }
+
+            _clips = Array.Empty<AudioClip>();
+        }
+
+        internal bool TryGetRandomPlayback(out PhysSoundImpactPlayback playback)
+        {
+            int validCount = 0;
+            for (int i = 0; i < _clipSources.Count; i++)
+            {
+                PhysSoundImpactClipSource source = _clipSources[i];
+                if (source?.SourceClip != null && source.Regions.Count > 0)
+                {
+                    for (int j = 0; j < source.Regions.Count; j++)
+                    {
+                        if (IsValidRegion(source.SourceClip, source.Regions[j]))
+                        {
+                            validCount++;
+                        }
+                    }
+
+                    continue;
+                }
+
+                AudioClip[] clips = source?.RuntimeClips;
+                if (clips == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < clips.Length; j++)
+                {
+                    if (clips[j] != null)
+                    {
+                        validCount++;
+                    }
+                }
+            }
+
+            if (validCount == 0)
+            {
+                playback = default;
+                return false;
+            }
+
+            int selected = UnityEngine.Random.Range(0, validCount);
+            for (int i = 0; i < _clipSources.Count; i++)
+            {
+                PhysSoundImpactClipSource source = _clipSources[i];
+                if (source?.SourceClip != null && source.Regions.Count > 0)
+                {
+                    for (int j = 0; j < source.Regions.Count; j++)
+                    {
+                        PhysSoundAudioRegion region = source.Regions[j];
+                        if (!IsValidRegion(source.SourceClip, region))
+                        {
+                            continue;
+                        }
+
+                        if (selected-- == 0)
+                        {
+                            float start = Mathf.Clamp(region.StartTime, 0f, source.SourceClip.length);
+                            float end = Mathf.Clamp(region.EndTime, start, source.SourceClip.length);
+                            playback = new PhysSoundImpactPlayback(source.SourceClip, start, end);
+                            return true;
+                        }
+                    }
+
+                    continue;
+                }
+
+                AudioClip[] clips = source?.RuntimeClips;
+                if (clips == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < clips.Length; j++)
+                {
+                    if (clips[j] == null)
+                    {
+                        continue;
+                    }
+
+                    if (selected-- == 0)
+                    {
+                        playback = new PhysSoundImpactPlayback(clips[j], 0f, clips[j].length);
+                        return true;
+                    }
+                }
+            }
+
+            playback = default;
+            return false;
+        }
+
+        private static bool IsValidRegion(AudioClip clip, PhysSoundAudioRegion region)
+        {
+            return region != null && region.StartTime < clip.length && region.EndTime > region.StartTime;
+        }
     }
 
     [Serializable]
     internal sealed class PhysSoundInteraction : ISerializationCallbackReceiver
     {
-        private const int CurrentDataVersion = 1;
+        private const int CurrentDataVersion = 3;
 
         [Header("Impact")]
         [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
@@ -78,19 +226,18 @@ namespace PhysSound
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _slideRegions = new();
 
         internal bool HasSlide => HasValidClip(_slideClips);
-        internal AudioClip ImpactSourceClip { get => _impactSourceClip; set => _impactSourceClip = value; }
-        internal List<PhysSoundAudioRegion> ImpactRegions => _impactRegions;
         internal List<PhysSoundImpactRange> ImpactRanges => _impactRanges;
         internal float MinimumImpactImpulse => _minimumImpactImpulse;
         internal float MaximumImpactImpulse => _maximumImpactImpulse;
         internal AudioClip SlideSourceClip { get => _slideSourceClip; set => _slideSourceClip = value; }
         internal List<PhysSoundAudioRegion> SlideRegions => _slideRegions;
 
-        internal void SetExportedImpactClips(AudioClip[] clips, int rangeIndex)
+        internal void SetExportedImpactClips(AudioClip[] clips, int rangeIndex, int sourceIndex)
         {
-            if (rangeIndex >= 0 && rangeIndex < _impactRanges.Count)
+            if (rangeIndex >= 0 && rangeIndex < _impactRanges.Count &&
+                sourceIndex >= 0 && sourceIndex < _impactRanges[rangeIndex].ClipSources.Count)
             {
-                _impactRanges[rangeIndex].Clips = clips;
+                _impactRanges[rangeIndex].ClipSources[sourceIndex].RuntimeClips = clips;
             }
             else
             {
@@ -103,11 +250,13 @@ namespace PhysSound
             _slideClips = clips ?? Array.Empty<AudioClip>();
         }
 
-        internal AudioClip GetImpactClip(float impulse)
+        internal bool TryGetImpactPlayback(float impulse, out PhysSoundImpactPlayback playback)
         {
             if (_impactRanges.Count == 0)
             {
-                return GetRandomClip(_impactClips);
+                AudioClip clip = GetRandomClip(_impactClips);
+                playback = clip == null ? default : new PhysSoundImpactPlayback(clip, 0f, clip.length);
+                return clip != null;
             }
 
             for (int i = 0; i < _impactRanges.Count; i++)
@@ -115,11 +264,12 @@ namespace PhysSound
                 PhysSoundImpactRange range = _impactRanges[i];
                 if (range != null && range.Contains(impulse))
                 {
-                    return GetRandomClip(range.Clips);
+                    return range.TryGetRandomPlayback(out playback);
                 }
             }
 
-            return null;
+            playback = default;
+            return false;
         }
 
         internal PhysSoundImpactRange CreateInitialImpactRange()
@@ -129,6 +279,7 @@ namespace PhysSound
                 _maximumImpactImpulse,
                 _impactClips);
             _impactRanges.Add(range);
+            range.MigrateLegacyClips();
             return range;
         }
 
@@ -149,7 +300,49 @@ namespace PhysSound
                 CreateInitialImpactRange();
             }
 
+            for (int i = 0; i < _impactRanges.Count; i++)
+            {
+                _impactRanges[i]?.MigrateLegacyClips();
+            }
+
+            MigrateLegacyImpactSource();
+
             _dataVersion = CurrentDataVersion;
+        }
+
+        private void MigrateLegacyImpactSource()
+        {
+            if (_impactSourceClip == null)
+            {
+                return;
+            }
+
+            if (_impactRanges.Count == 0)
+            {
+                CreateInitialImpactRange();
+            }
+
+            PhysSoundImpactRange range = _impactRanges[0];
+            PhysSoundImpactClipSource source = null;
+            for (int i = 0; i < range.ClipSources.Count; i++)
+            {
+                if (range.ClipSources[i]?.SourceClip == _impactSourceClip)
+                {
+                    source = range.ClipSources[i];
+                    break;
+                }
+            }
+
+            source ??= new PhysSoundImpactClipSource(_impactSourceClip);
+            if (!range.ClipSources.Contains(source))
+            {
+                range.ClipSources.Add(source);
+            }
+
+            if (source.Regions.Count == 0 && _impactRegions != null)
+            {
+                source.Regions.AddRange(_impactRegions);
+            }
         }
 
         internal AudioClip GetSlideClip()

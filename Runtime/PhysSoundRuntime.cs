@@ -416,10 +416,9 @@ namespace PhysSound
 			}
 
 			PhysSoundInteraction interaction = _interactionValues[interactionIndex];
-			AudioClip clip = interaction.GetImpactClip(impulse);
 			float volume = interaction.EvaluateImpactVolume(impulse);
 
-			if (clip == null || volume <= 0f)
+			if (!interaction.TryGetImpactPlayback(impulse, out PhysSoundImpactPlayback playback) || volume <= 0f)
 			{
 				return;
 			}
@@ -431,9 +430,12 @@ namespace PhysSound
 
 			ref PhysSoundEmitter emitter = ref _emitters[emitterIndex];
 			emitter.Source.loop = false;
-			emitter.Source.resource = clip;
+			emitter.Source.resource = playback.Clip;
 			emitter.Source.volume = volume;
 			emitter.Source.pitch = interaction.GetImpactPitch();
+			emitter.Source.time = playback.StartTime;
+			emitter.ImpactEndDspTime = AudioSettings.dspTime +
+			                           (playback.EndTime - playback.StartTime) / Mathf.Max(0.01f, Mathf.Abs(emitter.Source.pitch));
 			emitter.Source.Play();
 		}
 
@@ -531,7 +533,7 @@ namespace PhysSound
 
 				if (emitter.Mode == PhysSoundEmitterMode.Impact)
 				{
-					if (!emitter.Source.isPlaying)
+					if (!emitter.Source.isPlaying || AudioSettings.dspTime >= emitter.ImpactEndDspTime)
 					{
 						ReleaseEmitter(i);
 					}
@@ -641,6 +643,7 @@ namespace PhysSound
 			emitter.TargetVolume = 0f;
 			emitter.TargetPitch = 1f;
 			emitter.LastSeenAt = Time.unscaledTime;
+			emitter.ImpactEndDspTime = 0d;
 			emitter.Stopping = false;
 		}
 
@@ -665,6 +668,7 @@ namespace PhysSound
 			emitter.InteractionIndex = -1;
 			emitter.TargetVolume = 0f;
 			emitter.TargetPitch = 1f;
+			emitter.ImpactEndDspTime = 0d;
 			emitter.Stopping = false;
 		}
 

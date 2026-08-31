@@ -12,6 +12,7 @@ namespace PhysSound
 		internal float TargetVolume;
 		internal float TargetPitch;
 		internal float LastSeenAt;
+		internal double ImpactEndDspTime;
 		internal bool Stopping;
 	}
 }

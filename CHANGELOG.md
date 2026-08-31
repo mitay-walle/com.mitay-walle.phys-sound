@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added guided nonlinear Impact Range authoring and migrated legacy Impact Clips into the first range without losing clip references or impulse limits.
+- Added the guided `Slice Force`, `Slice Impact Clips`, and `Slice Slide Clips` workflow. Every impact force range now exposes each source clip separately for waveform markup and auditioning; marked impact regions play directly at runtime without exported slice assets, while export remains optional. Legacy clips and markup migrate into the new model.
 
 All notable changes to this package are documented in this file.
 

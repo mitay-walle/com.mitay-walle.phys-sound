@@ -15,6 +15,7 @@ namespace PhysSound.Editor
             PhysSoundInteraction interaction,
             bool impact,
             int impactRangeIndex,
+            int impactSourceIndex,
             AudioClip source,
             List<PhysSoundAudioRegion> regions)
         {
@@ -69,7 +70,7 @@ namespace PhysSound.Editor
                 Undo.RecordObject(owner, "Export Phys Sound Audio Regions");
                 if (impact)
                 {
-                    interaction.SetExportedImpactClips(clips, impactRangeIndex);
+                    interaction.SetExportedImpactClips(clips, impactRangeIndex, impactSourceIndex);
                 }
                 else
                 {
