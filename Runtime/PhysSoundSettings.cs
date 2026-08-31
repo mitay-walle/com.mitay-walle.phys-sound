@@ -31,22 +31,22 @@ namespace PhysSound
     internal sealed class PhysSoundInteraction
     {
         [Header("Impact")]
-        [SerializeField] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
-        [SerializeField] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-        [SerializeField, InspectorName("Impact Impulse Range"), PhysSoundMinMax(nameof(_maximumImpactImpulse), 0f, 20f)]
+        [SerializeField, InspectorName("Clips")] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
+        [SerializeField, InspectorName("Volume Curve")] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        [SerializeField, InspectorName("Volume"), Min(0f)] private float _impactVolumeMultiplier = 1f;
+        [SerializeField, PhysSoundMinMax(nameof(_maximumImpactImpulse), 0f, 20f, "Impulse")]
         private float _minimumImpactImpulse = 0.1f;
         [SerializeField, HideInInspector] private float _maximumImpactImpulse = 10f;
-        [SerializeField, Min(0f)] private float _impactVolumeMultiplier = 1f;
-        [SerializeField, PhysSoundMinMax(0.1f, 3f)] private Vector2 _impactPitchRange = new Vector2(0.95f, 1.05f);
+        [SerializeField, PhysSoundMinMax(0.1f, 3f, "Pitch")] private Vector2 _impactPitchRange = new Vector2(0.95f, 1.05f);
 
         [Header("Slide")]
-        [SerializeField] private AudioClip[] _slideClips = Array.Empty<AudioClip>();
-        [SerializeField] private AnimationCurve _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-        [SerializeField, InspectorName("Slide Speed Range"), PhysSoundMinMax(nameof(_maximumSlideSpeed), 0f, 300f)]
+        [SerializeField, InspectorName("Clips")] private AudioClip[] _slideClips = Array.Empty<AudioClip>();
+        [SerializeField, InspectorName("Volume Curve")] private AnimationCurve _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        [SerializeField, InspectorName("Volume"), Min(0f)] private float _slideVolumeMultiplier = 1f;
+        [SerializeField, PhysSoundMinMax(nameof(_maximumSlideSpeed), 0f, 300f, "Speed")]
         private float _minimumSlideSpeed = 0.05f;
         [SerializeField, HideInInspector] private float _maximumSlideSpeed = 5f;
-        [SerializeField, Min(0f)] private float _slideVolumeMultiplier = 1f;
-        [SerializeField, PhysSoundMinMax(0.1f, 3f)] private Vector2 _slidePitchRange = new Vector2(0.9f, 1.2f);
+        [SerializeField, PhysSoundMinMax(0.1f, 3f, "Pitch")] private Vector2 _slidePitchRange = new Vector2(0.9f, 1.2f);
 
         [SerializeField, HideInInspector] private AudioClip _impactSourceClip;
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _impactRegions = new();

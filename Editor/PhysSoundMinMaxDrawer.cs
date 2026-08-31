@@ -13,6 +13,11 @@ namespace PhysSound.Editor
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             PhysSoundMinMaxAttribute range = (PhysSoundMinMaxAttribute)attribute;
+            if (!string.IsNullOrEmpty(range.DisplayName))
+            {
+                label = new GUIContent(range.DisplayName, label.tooltip);
+            }
+
             if (property.propertyType == SerializedPropertyType.Float &&
                 !string.IsNullOrEmpty(range.MaximumPropertyName))
             {
