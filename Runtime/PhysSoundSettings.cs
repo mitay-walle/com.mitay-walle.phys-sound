@@ -31,18 +31,18 @@ namespace PhysSound
     internal sealed class PhysSoundInteraction
     {
         [Header("Impact")]
-        [SerializeField, InspectorName("Clips")] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
-        [SerializeField, InspectorName("Volume Curve")] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-        [SerializeField, InspectorName("Volume"), Min(0f)] private float _impactVolumeMultiplier = 1f;
+        [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
+        [SerializeField, PhysSoundLabel("Volume Curve")] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        [SerializeField, PhysSoundLabel("Volume"), Min(0f)] private float _impactVolumeMultiplier = 1f;
         [SerializeField, PhysSoundMinMax(nameof(_maximumImpactImpulse), 0f, 20f, "Impulse")]
         private float _minimumImpactImpulse = 0.1f;
         [SerializeField, HideInInspector] private float _maximumImpactImpulse = 10f;
         [SerializeField, PhysSoundMinMax(0.1f, 3f, "Pitch")] private Vector2 _impactPitchRange = new Vector2(0.95f, 1.05f);
 
         [Header("Slide")]
-        [SerializeField, InspectorName("Clips")] private AudioClip[] _slideClips = Array.Empty<AudioClip>();
-        [SerializeField, InspectorName("Volume Curve")] private AnimationCurve _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-        [SerializeField, InspectorName("Volume"), Min(0f)] private float _slideVolumeMultiplier = 1f;
+        [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _slideClips = Array.Empty<AudioClip>();
+        [SerializeField, PhysSoundLabel("Volume Curve")] private AnimationCurve _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        [SerializeField, PhysSoundLabel("Volume"), Min(0f)] private float _slideVolumeMultiplier = 1f;
         [SerializeField, PhysSoundMinMax(nameof(_maximumSlideSpeed), 0f, 300f, "Speed")]
         private float _minimumSlideSpeed = 0.05f;
         [SerializeField, HideInInspector] private float _maximumSlideSpeed = 5f;

@@ -18,6 +18,7 @@ namespace PhysSound.Editor
         private const float HandleWidth = 6f;
         private const float MinimumRegionPixels = 3f;
         private const float MinimumVisibleFraction = 0.005f;
+        private const float DetectionSliderExponent = 2f;
 
         private static readonly Color WaveformColor = new(0.55f, 0.78f, 1f, 0.9f);
         private static readonly Color RegionColor = new(0.2f, 0.65f, 1f, 0.2f);
@@ -685,8 +686,23 @@ namespace PhysSound.Editor
         {
             float previousLabelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = Mathf.Min(145f, rect.width * 0.58f);
-            EditorGUI.MinMaxSlider(rect, new GUIContent(label), ref minimum, ref maximum, limitMinimum, limitMaximum);
+            float sliderMinimum = ToSliderPosition(minimum, limitMinimum, limitMaximum);
+            float sliderMaximum = ToSliderPosition(maximum, limitMinimum, limitMaximum);
+            EditorGUI.MinMaxSlider(rect, new GUIContent(label), ref sliderMinimum, ref sliderMaximum, 0f, 1f);
+            minimum = FromSliderPosition(sliderMinimum, limitMinimum, limitMaximum);
+            maximum = FromSliderPosition(sliderMaximum, limitMinimum, limitMaximum);
             EditorGUIUtility.labelWidth = previousLabelWidth;
+        }
+
+        private static float ToSliderPosition(float value, float minimum, float maximum)
+        {
+            float normalized = Mathf.InverseLerp(minimum, maximum, value);
+            return Mathf.Pow(normalized, 1f / DetectionSliderExponent);
+        }
+
+        private static float FromSliderPosition(float position, float minimum, float maximum)
+        {
+            return Mathf.Lerp(minimum, maximum, Mathf.Pow(position, DetectionSliderExponent));
         }
 
         private static void SplitRow(Rect row, out Rect left, out Rect right)
