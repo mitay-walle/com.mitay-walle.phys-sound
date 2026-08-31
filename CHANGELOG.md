@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added guided nonlinear Impact Range authoring and migrated legacy Impact Clips into the first range without losing clip references or impulse limits.
+
 All notable changes to this package are documented in this file.
 
 ## [2.0.0]

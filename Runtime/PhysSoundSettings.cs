@@ -48,8 +48,10 @@ namespace PhysSound
     }
 
     [Serializable]
-    internal sealed class PhysSoundInteraction
+    internal sealed class PhysSoundInteraction : ISerializationCallbackReceiver
     {
+        private const int CurrentDataVersion = 1;
+
         [Header("Impact")]
         [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
         [SerializeField, PhysSoundLabel("Volume Curve")] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
@@ -71,6 +73,7 @@ namespace PhysSound
         [SerializeField, HideInInspector] private AudioClip _impactSourceClip;
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _impactRegions = new();
         [SerializeField, HideInInspector] private List<PhysSoundImpactRange> _impactRanges = new();
+        [SerializeField, HideInInspector] private int _dataVersion;
         [SerializeField, HideInInspector] private AudioClip _slideSourceClip;
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _slideRegions = new();
 
@@ -127,6 +130,26 @@ namespace PhysSound
                 _impactClips);
             _impactRanges.Add(range);
             return range;
+        }
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            if (_dataVersion >= CurrentDataVersion)
+            {
+                return;
+            }
+
+            _impactRanges ??= new List<PhysSoundImpactRange>();
+            if (_impactRanges.Count == 0 && HasValidClip(_impactClips))
+            {
+                CreateInitialImpactRange();
+            }
+
+            _dataVersion = CurrentDataVersion;
         }
 
         internal AudioClip GetSlideClip()
