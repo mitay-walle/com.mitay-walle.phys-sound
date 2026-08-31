@@ -9,10 +9,14 @@ namespace PhysSound
     public sealed class PhysSoundObject : MonoBehaviour
     {
         private PhysSoundContinuousContactReceiver _continuousReceiver;
+#if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
+        private readonly HashSet<PhysSoundPairKey> _pairs2D = new();
+        private EntityId _ownerId2D;
+#endif
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (!PhysSoundRuntime.ReportComponentEnter(this, collision, out ulong pairKey))
+            if (!PhysSoundRuntime.ReportComponentEnter(this, collision, out PhysSoundPairKey pairKey))
             {
                 return;
             }
@@ -33,7 +37,43 @@ namespace PhysSound
                 _continuousReceiver.Shutdown();
                 _continuousReceiver = null;
             }
+
+#if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
+            PhysSoundRuntime.ReportComponentDisabled(_ownerId2D, _pairs2D);
+            _pairs2D.Clear();
+#endif
         }
+
+#if PHYS_SOUND_2D && !PHYS_SOUND_DISABLE_2D
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (_ownerId2D == default)
+            {
+                _ownerId2D = this.GetEntityId();
+            }
+
+            if (PhysSoundRuntime.ReportComponentEnter2D(_ownerId2D, collision, out PhysSoundPairKey pairKey))
+            {
+                _pairs2D.Add(pairKey);
+            }
+        }
+
+        private void OnCollisionStay2D(Collision2D collision)
+        {
+            if (PhysSoundRuntime.TryGetPairKey2D(collision, out PhysSoundPairKey pairKey) && _pairs2D.Contains(pairKey))
+            {
+                PhysSoundRuntime.ReportComponentStay2D(_ownerId2D, pairKey, collision);
+            }
+        }
+
+        private void OnCollisionExit2D(Collision2D collision)
+        {
+            if (PhysSoundRuntime.TryGetPairKey2D(collision, out PhysSoundPairKey pairKey) && _pairs2D.Remove(pairKey))
+            {
+                PhysSoundRuntime.ReportComponentExit(_ownerId2D, pairKey);
+            }
+        }
+#endif
 
         internal void Detach(PhysSoundContinuousContactReceiver receiver)
         {
@@ -47,20 +87,20 @@ namespace PhysSound
     [AddComponentMenu("")]
     internal sealed class PhysSoundContinuousContactReceiver : MonoBehaviour
     {
-        private readonly HashSet<ulong> _pairKeys = new HashSet<ulong>();
+        private readonly HashSet<PhysSoundPairKey> _pairKeys = new HashSet<PhysSoundPairKey>();
 
         private PhysSoundObject _owner;
-        private int _ownerId;
+        private EntityId _ownerId;
         private bool _shuttingDown;
 
         internal void Initialize(PhysSoundObject owner)
         {
             _owner = owner;
-            _ownerId = owner.GetInstanceID();
+            _ownerId = owner.GetEntityId();
             hideFlags = HideFlags.HideInInspector | HideFlags.DontSave;
         }
 
-        internal void Track(ulong pairKey)
+        internal void Track(PhysSoundPairKey pairKey)
         {
             _pairKeys.Add(pairKey);
         }
@@ -87,7 +127,7 @@ namespace PhysSound
         private void OnCollisionStay(Collision collision)
         {
             if (_shuttingDown ||
-                !PhysSoundRuntime.TryGetPairKey(collision, out ulong pairKey) ||
+                !PhysSoundRuntime.TryGetPairKey(collision, out PhysSoundPairKey pairKey) ||
                 !_pairKeys.Contains(pairKey))
             {
                 return;
@@ -99,7 +139,7 @@ namespace PhysSound
         private void OnCollisionExit(Collision collision)
         {
             if (_shuttingDown ||
-                !PhysSoundRuntime.TryGetPairKey(collision, out ulong pairKey) ||
+                !PhysSoundRuntime.TryGetPairKey(collision, out PhysSoundPairKey pairKey) ||
                 !_pairKeys.Remove(pairKey))
             {
                 return;

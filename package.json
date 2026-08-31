@@ -3,8 +3,8 @@
   "version": "2.0.0",
   "displayName": "Phys Sound",
   "description": "Physics-driven impact and sliding audio for Unity 3D, using Unity 6 AudioResource playback and pooled native spatial AudioSources.",
-  "unity": "6000.5",
-  "unityRelease": "0f1",
+  "unity": "6000.6",
+  "unityRelease": "0a7",
   "documentationUrl": "https://github.com/mitay-walle/com.mitay-walle.phys-sound/blob/master/README.md",
   "changelogUrl": "https://github.com/mitay-walle/com.mitay-walle.phys-sound/blob/master/CHANGELOG.md",
   "licensesUrl": "https://github.com/mitay-walle/com.mitay-walle.phys-sound/blob/master/LICENSE.md",
@@ -16,5 +16,27 @@
     "Impact",
     "Sliding"
   ],
-  "author": "mitay-walle <mitay-walle91@mail.ru> (https://github.com/mitay-walle)"
+  "author": "mitay-walle <mitay-walle91@mail.ru> (https://github.com/mitay-walle)",
+  "samples": [
+    {
+      "displayName": "Example Scene 3D",
+      "description": "",
+      "path": "Samples~/ExampleScene3D"
+    },
+    {
+      "displayName": "Example Scene 2D",
+      "description": "",
+      "path": "Samples~/ExampleScene2D"
+    },
+    {
+      "displayName": "Starter Pack 3D",
+      "description": "A ready-to-use Phys Sound profile with sounds and Physics Material assets.",
+      "path": "Samples~/StarterPack3D"
+    },
+    {
+      "displayName": "Starter Pack 2D",
+      "description": "A ready-to-use Phys Sound profile with sounds and Physics Material 2D assets.",
+      "path": "Samples~/StarterPack2D"
+    }
+  ]
 }
