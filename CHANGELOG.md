@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added the guided `Slice Force`, `Slice Impact Clips`, and `Slice Slide Clips` workflow. Every impact force range now exposes each source clip separately for waveform markup and auditioning; marked impact regions play directly at runtime without exported slice assets, while export remains optional. Legacy clips and markup migrate into the new model.
+- Added scrollable impact source lists and a `Curves` step backed by a reusable two-point `AnimationCurve` drawer for volume and pitch. Each half of the gradient viewport controls one endpoint with live hover feedback; vertical dragging changes its value, horizontal dragging rotates its inner tangent, and side `Min`/`Max` fields provide exact entry.
 
 All notable changes to this package are documented in this file.
 

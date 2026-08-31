@@ -198,25 +198,27 @@ namespace PhysSound
     [Serializable]
     internal sealed class PhysSoundInteraction : ISerializationCallbackReceiver
     {
-        private const int CurrentDataVersion = 3;
+        private const int CurrentDataVersion = 4;
 
         [Header("Impact")]
         [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _impactClips = Array.Empty<AudioClip>();
-        [SerializeField, PhysSoundLabel("Volume Curve")] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0f, 1f)] private AnimationCurve _impactVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
         [SerializeField, PhysSoundLabel("Volume"), Min(0f)] private float _impactVolumeMultiplier = 1f;
         [SerializeField, PhysSoundMinMax(nameof(_maximumImpactImpulse), 0f, 20f, "Impulse")]
         private float _minimumImpactImpulse = 0.1f;
         [SerializeField, HideInInspector] private float _maximumImpactImpulse = 10f;
-        [SerializeField, PhysSoundMinMax(0.1f, 3f, "Pitch")] private Vector2 _impactPitchRange = new Vector2(0.95f, 1.05f);
+        [SerializeField, HideInInspector] private Vector2 _impactPitchRange = new Vector2(0.95f, 1.05f);
+        [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0.1f, 3f)] private AnimationCurve _impactPitch = AnimationCurve.Linear(0f, 0.95f, 1f, 1.05f);
 
         [Header("Slide")]
         [SerializeField, PhysSoundLabel("Clips")] private AudioClip[] _slideClips = Array.Empty<AudioClip>();
-        [SerializeField, PhysSoundLabel("Volume Curve")] private AnimationCurve _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0f, 1f)] private AnimationCurve _slideVolume = AnimationCurve.Linear(0f, 0f, 1f, 1f);
         [SerializeField, PhysSoundLabel("Volume"), Min(0f)] private float _slideVolumeMultiplier = 1f;
         [SerializeField, PhysSoundMinMax(nameof(_maximumSlideSpeed), 0f, 300f, "Speed")]
         private float _minimumSlideSpeed = 0.05f;
         [SerializeField, HideInInspector] private float _maximumSlideSpeed = 5f;
-        [SerializeField, PhysSoundMinMax(0.1f, 3f, "Pitch")] private Vector2 _slidePitchRange = new Vector2(0.9f, 1.2f);
+        [SerializeField, HideInInspector] private Vector2 _slidePitchRange = new Vector2(0.9f, 1.2f);
+        [SerializeField, HideInInspector, PhysSoundTwoPointCurve(0.1f, 3f)] private AnimationCurve _slidePitch = AnimationCurve.Linear(0f, 0.9f, 1f, 1.2f);
 
         [SerializeField, HideInInspector] private AudioClip _impactSourceClip;
         [SerializeField, HideInInspector] private List<PhysSoundAudioRegion> _impactRegions = new();
@@ -307,6 +309,14 @@ namespace PhysSound
 
             MigrateLegacyImpactSource();
 
+            if (_dataVersion < 4)
+            {
+                _impactVolume = CreateTwoPointCurve(_impactVolume, 0f, 1f);
+                _slideVolume = CreateTwoPointCurve(_slideVolume, 0f, 1f);
+                _impactPitch = AnimationCurve.Linear(0f, _impactPitchRange.x, 1f, _impactPitchRange.y);
+                _slidePitch = AnimationCurve.Linear(0f, _slidePitchRange.x, 1f, _slidePitchRange.y);
+            }
+
             _dataVersion = CurrentDataVersion;
         }
 
@@ -365,11 +375,13 @@ namespace PhysSound
             return Mathf.Max(0f, value) * _impactVolumeMultiplier;
         }
 
-        internal float GetImpactPitch()
+        internal float EvaluateImpactPitch(float impulse)
         {
-            float min = Mathf.Min(_impactPitchRange.x, _impactPitchRange.y);
-            float max = Mathf.Max(_impactPitchRange.x, _impactPitchRange.y);
-            return UnityEngine.Random.Range(min, max);
+            float normalized = _maximumImpactImpulse <= _minimumImpactImpulse
+                ? 1f
+                : Mathf.InverseLerp(_minimumImpactImpulse, _maximumImpactImpulse, impulse);
+
+            return Mathf.Max(0.01f, _impactPitch.Evaluate(normalized));
         }
 
         internal float EvaluateSlideVolume(float speed)
@@ -393,7 +405,21 @@ namespace PhysSound
                 ? 1f
                 : Mathf.InverseLerp(_minimumSlideSpeed, _maximumSlideSpeed, speed);
 
-            return Mathf.Lerp(_slidePitchRange.x, _slidePitchRange.y, normalized);
+            return Mathf.Max(0.01f, _slidePitch.Evaluate(normalized));
+        }
+
+        private static AnimationCurve CreateTwoPointCurve(AnimationCurve source, float minimum, float maximum)
+        {
+            if (source == null || source.length == 0)
+            {
+                return AnimationCurve.Linear(0f, minimum, 1f, maximum);
+            }
+
+            Keyframe first = source.keys[0];
+            Keyframe last = source.keys[source.length - 1];
+            return new AnimationCurve(
+                new Keyframe(0f, Mathf.Clamp(first.value, minimum, maximum), first.inTangent, first.outTangent),
+                new Keyframe(1f, Mathf.Clamp(last.value, minimum, maximum), last.inTangent, last.outTangent));
         }
 
         private static bool HasValidClip(AudioClip[] clips)

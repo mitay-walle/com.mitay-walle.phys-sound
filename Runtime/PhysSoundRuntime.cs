@@ -432,7 +432,7 @@ namespace PhysSound
 			emitter.Source.loop = false;
 			emitter.Source.resource = playback.Clip;
 			emitter.Source.volume = volume;
-			emitter.Source.pitch = interaction.GetImpactPitch();
+			emitter.Source.pitch = interaction.EvaluateImpactPitch(impulse);
 			emitter.Source.time = playback.StartTime;
 			emitter.ImpactEndDspTime = AudioSettings.dspTime +
 			                           (playback.EndTime - playback.StartTime) / Mathf.Max(0.01f, Mathf.Abs(emitter.Source.pitch));

@@ -45,6 +45,7 @@ namespace PhysSound.Editor
         private int _selectedImpactRange;
         private int _selectedImpactSource;
         private int _dragImpactBoundary = -1;
+        private int _curveMode;
         private PreviewMode _mode;
         private DragMode _dragMode;
         private float _dragStartTime;
@@ -53,6 +54,7 @@ namespace PhysSound.Editor
         private float _viewStartNormalized;
         private float _viewEndNormalized = 1f;
         private bool _isPanning;
+        private Vector2 _impactSourceScroll;
         private float _soundVolumeMinDb = -36f;
         private float _soundVolumeMaxDb;
         private float _pauseVolumeMinDb = -80f;
@@ -94,6 +96,12 @@ namespace PhysSound.Editor
                 return;
             }
 
+            if (_mode == PreviewMode.Curves)
+            {
+                DrawCurves(rect, owner, entry);
+                return;
+            }
+
             Rect clipRect = TakeTop(ref rect, ClipRowHeight);
             AudioClip clip = DrawClipField(clipRect, owner, entry.Interaction);
             rect.yMin += Spacing;
@@ -128,34 +136,63 @@ namespace PhysSound.Editor
 
             if (owner is PhysSoundSettings settings)
             {
-                _entries.Add(new PreviewEntry("Default", settings.DefaultInteraction));
-                AddInteractions(settings.Interactions);
+                _entries.Add(new PreviewEntry("Default", settings.DefaultInteraction, "_defaultInteraction"));
+                AddInteractions(settings.Interactions, owner, "_interactions");
             }
             else if (owner is PhysSoundSubprofile subprofile)
             {
-                AddInteractions(subprofile.Interactions);
+                AddInteractions(subprofile.Interactions, owner, "_interactions");
             }
         }
 
-        private void AddInteractions(Dictionary<PhysSoundInteractionKey, PhysSoundInteraction> interactions)
+        private void AddInteractions(
+            Dictionary<PhysSoundInteractionKey, PhysSoundInteraction> interactions,
+            Object owner,
+            string dictionaryPath)
         {
             if (interactions == null)
             {
                 return;
             }
 
+            SerializedObject serializedOwner = new(owner);
             foreach ((PhysSoundInteractionKey key, PhysSoundInteraction interaction) in interactions)
             {
                 if (interaction != null)
                 {
-                    _entries.Add(new PreviewEntry(key.PreviewName, interaction));
+                    _entries.Add(new PreviewEntry(
+                        key.PreviewName,
+                        interaction,
+                        FindInteractionPropertyPath(serializedOwner, dictionaryPath, key)));
                 }
             }
         }
 
+        private static string FindInteractionPropertyPath(
+            SerializedObject serializedOwner,
+            string dictionaryPath,
+            PhysSoundInteractionKey key)
+        {
+            SerializedProperty dictionary = serializedOwner.FindProperty(dictionaryPath);
+            for (int i = 0; dictionary != null && i < dictionary.arraySize; i++)
+            {
+                string elementPath = $"{dictionaryPath}.Array.data[{i}]";
+                SerializedProperty surfaceA = serializedOwner.FindProperty($"{elementPath}.key._surfaceA");
+                SerializedProperty surfaceB = serializedOwner.FindProperty($"{elementPath}.key._surfaceB");
+                if (surfaceA != null && surfaceB != null &&
+                    string.Equals(surfaceA.stringValue, key.SurfaceA, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(surfaceB.stringValue, key.SurfaceB, StringComparison.OrdinalIgnoreCase))
+                {
+                    return $"{elementPath}.value";
+                }
+            }
+
+            return null;
+        }
+
         private void DrawToolbar(Rect rect)
         {
-            float modeWidth = Mathf.Min(330f, rect.width * 0.62f);
+            float modeWidth = Mathf.Min(440f, rect.width * 0.72f);
             Rect interactionRect = new(rect.x, rect.y, rect.width - modeWidth - Spacing, rect.height);
             Rect modeRect = new(interactionRect.xMax + Spacing, rect.y, modeWidth, rect.height);
 
@@ -169,7 +206,7 @@ namespace PhysSound.Editor
             int selectedMode = GUI.Toolbar(
                 modeRect,
                 (int)_mode,
-                new[] { "Slice Force", "Slice Impact Clips", "Slice Slide Clips" },
+                new[] { "Slice Force", "Slice Impact Clips", "Slice Slide Clips", "Curves" },
                 EditorStyles.toolbarButton);
 
             if (selectedInteraction != _selectedInteraction || selectedMode != (int)_mode)
@@ -179,6 +216,7 @@ namespace PhysSound.Editor
                 _mode = (PreviewMode)selectedMode;
                 _selectedRegion = -1;
                 _dragMode = DragMode.None;
+                _impactSourceScroll = Vector2.zero;
                 ResetView();
             }
         }
@@ -236,6 +274,7 @@ namespace PhysSound.Editor
                 _selectedImpactRange = selectedRange;
                 _selectedImpactSource = 0;
                 _selectedRegion = -1;
+                _impactSourceScroll = Vector2.zero;
                 ResetView();
             }
 
@@ -285,11 +324,16 @@ namespace PhysSound.Editor
         private void DrawImpactSourceList(Rect rect, Object owner, List<PhysSoundImpactClipSource> sources)
         {
             GUI.Box(rect, GUIContent.none);
-            float y = rect.y + 3f;
-            for (int i = 0; i < sources.Count && y + 20f < rect.yMax - 25f; i++)
+            Rect scrollRect = new(rect.x + 3f, rect.y + 3f, rect.width - 6f, Mathf.Max(0f, rect.height - 28f));
+            float contentHeight = Mathf.Max(scrollRect.height, sources.Count * 22f);
+            bool needsScrollbar = contentHeight > scrollRect.height;
+            Rect viewRect = new(0f, 0f, scrollRect.width - (needsScrollbar ? 16f : 0f), contentHeight);
+            _impactSourceScroll = GUI.BeginScrollView(scrollRect, _impactSourceScroll, viewRect, false, needsScrollbar);
+            float y = 0f;
+            for (int i = 0; i < sources.Count; i++)
             {
                 PhysSoundImpactClipSource source = sources[i];
-                Rect row = new Rect(rect.x + 3f, y, rect.width - 29f, 20f);
+                Rect row = new Rect(0f, y, viewRect.width - 24f, 20f);
                 Rect play = new Rect(row.xMax + 2f, y, 21f, 20f);
                 string name = source.SourceClip == null ? "None" : source.SourceClip.name;
                 if (GUI.Toggle(row, i == _selectedImpactSource, name, EditorStyles.miniButton) && i != _selectedImpactSource)
@@ -302,11 +346,13 @@ namespace PhysSound.Editor
 
                 if (GUI.Button(play, "▶") && source.SourceClip != null)
                 {
-                    Play(source.SourceClip, 0f, source.SourceClip.length);
+                    PlayMarkedOrFull(source.SourceClip, source.Regions);
                 }
 
                 y += 22f;
             }
+
+            GUI.EndScrollView();
 
             Rect add = new Rect(rect.x + 3f, rect.yMax - 22f, 45f, 19f);
             if (GUI.Button(add, "+"))
@@ -314,6 +360,7 @@ namespace PhysSound.Editor
                 Undo.RecordObject(owner, "Add Phys Sound Impact Clip");
                 sources.Add(new PhysSoundImpactClipSource(null));
                 _selectedImpactSource = sources.Count - 1;
+                _impactSourceScroll.y = contentHeight + 22f;
                 EditorUtility.SetDirty(owner);
             }
 
@@ -327,6 +374,36 @@ namespace PhysSound.Editor
                     EditorUtility.SetDirty(owner);
                 }
             }
+        }
+
+        private void DrawCurves(Rect rect, Object owner, PreviewEntry entry)
+        {
+            if (string.IsNullOrEmpty(entry.PropertyPath))
+            {
+                EditorGUI.HelpBox(rect, "Could not resolve this interaction's serialized curve properties.", MessageType.Error);
+                return;
+            }
+
+            Rect modeRect = TakeTop(ref rect, ToolbarHeight);
+            modeRect.width = Mathf.Min(180f, modeRect.width);
+            _curveMode = GUI.Toolbar(modeRect, _curveMode, new[] { "Impact", "Slide" }, EditorStyles.miniButton);
+            SerializedObject serializedOwner = new(owner);
+            serializedOwner.Update();
+            string prefix = _curveMode == 0 ? "_impact" : "_slide";
+            SerializedProperty volume = serializedOwner.FindProperty($"{entry.PropertyPath}.{prefix}Volume");
+            SerializedProperty pitch = serializedOwner.FindProperty($"{entry.PropertyPath}.{prefix}Pitch");
+            if (volume == null || pitch == null)
+            {
+                EditorGUI.HelpBox(rect, "Curve properties are unavailable.", MessageType.Error);
+                return;
+            }
+
+            float height = (rect.height - Spacing) * 0.5f;
+            Rect volumeRect = new(rect.x, rect.y, rect.width, height);
+            Rect pitchRect = new(rect.x, volumeRect.yMax + Spacing, rect.width, height);
+            EditorGUI.PropertyField(volumeRect, volume, new GUIContent("Volume"), true);
+            EditorGUI.PropertyField(pitchRect, pitch, new GUIContent("Pitch"), true);
+            serializedOwner.ApplyModifiedProperties();
         }
 
         private void DrawImpactRanges(Rect rect, Object owner, PhysSoundInteraction interaction)
@@ -579,7 +656,7 @@ namespace PhysSound.Editor
             float x = playbackRow.x;
             if (DrawButton(ref x, playbackRow, "Play", 48f))
             {
-                Play(clip, 0f, clip.length);
+                PlayMarkedOrFull(clip, regions);
             }
 
             using (new EditorGUI.DisabledScope(_selectedRegion < 0 || _selectedRegion >= regions.Count))
@@ -639,6 +716,40 @@ namespace PhysSound.Editor
             }
 
             DrawDetectionSliders(volumeRow, durationRow, clip);
+        }
+
+        private static void PlayMarkedOrFull(AudioClip clip, List<PhysSoundAudioRegion> regions)
+        {
+            int validCount = 0;
+            for (int i = 0; regions != null && i < regions.Count; i++)
+            {
+                if (regions[i] != null && regions[i].StartTime < clip.length && regions[i].EndTime > regions[i].StartTime)
+                {
+                    validCount++;
+                }
+            }
+
+            if (validCount == 0)
+            {
+                Play(clip, 0f, clip.length);
+                return;
+            }
+
+            int selected = UnityEngine.Random.Range(0, validCount);
+            for (int i = 0; i < regions.Count; i++)
+            {
+                PhysSoundAudioRegion region = regions[i];
+                if (region == null || region.StartTime >= clip.length || region.EndTime <= region.StartTime)
+                {
+                    continue;
+                }
+
+                if (selected-- == 0)
+                {
+                    Play(clip, region.StartTime, Mathf.Min(region.EndTime, clip.length));
+                    return;
+                }
+            }
         }
 
         private void HandleWaveformInput(Rect rect, AudioClip clip, Object owner, List<PhysSoundAudioRegion> regions)
@@ -1133,21 +1244,24 @@ namespace PhysSound.Editor
 
         private readonly struct PreviewEntry
         {
-            internal PreviewEntry(string name, PhysSoundInteraction interaction)
+            internal PreviewEntry(string name, PhysSoundInteraction interaction, string propertyPath)
             {
                 Name = name;
                 Interaction = interaction;
+                PropertyPath = propertyPath;
             }
 
             internal string Name { get; }
             internal PhysSoundInteraction Interaction { get; }
+            internal string PropertyPath { get; }
         }
 
         private enum PreviewMode
         {
             ImpactRanges,
             ImpactAudio,
-            SlideAudio
+            SlideAudio,
+            Curves
         }
 
         private enum DragMode
